@@ -1,0 +1,7 @@
+<%  o ||= @order
+    o ||= order if defined? order
+  if task = Admin::PosHelper.find_task(o) %>
+  <%= link_to edit_admin_pos_path( task ) do %>
+    <%= task.done ? image_tag('admin/icons/accept.png') : image_tag('admin/icons/exclamation.png') %>
+  <% end %>
+<% end %>

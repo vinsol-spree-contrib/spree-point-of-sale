@@ -1,0 +1,5 @@
+<div style='text-align:right;width:200px;float:right'>
+<%= link_to_unless( Admin::PosHelper.find_task(@product) ,  t('new_task') , new_admin_pos_path(:source_type => "Product" , :source_id => @product.id.to_s ) ) do %>
+  <%= render :partial =>  'admin/pos/product_icon_link' %>
+<% end %>
+</div>
