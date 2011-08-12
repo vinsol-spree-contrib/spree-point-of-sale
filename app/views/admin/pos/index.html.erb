@@ -1,6 +1,17 @@
+<% content_for :head do -%>
+<SCRIPT TYPE="text/javascript">
+<!--
+var newwindow;
+function poptastic(url)
+{ newwindow=window.open(url,'Print','width=400,left=300,top=50,resizable=no,scrollbars=yes,toolbar=yes,status=no');
+  if (window.focus) {newwindow.focus()}
+}
+//-->
+</SCRIPT>
+<% end %>
 <%= render 'shared/error_messages', :target => @pos %>
 <div id="add-line-item">
-    <legend><%= t('add_product') %></legend>
+    <legend><%= t('add_product') %>  </legend>
     
     <%= form_for [:admin, :pos ,  @search] do |f| %>
     <input type="hidden" value="1" name="index">
@@ -18,27 +29,35 @@
   <tr>
     <th><%= t('item_description') %></th>
     <th class="price"><%= t('price') %></th>
+    <th><%= t('remove') %></th>
+    <th><%= t('discount') %></th>
   </tr>
 
   <% @order.line_items.each do |item| %>
     <tr>
       <td width="300"><%=item.variant.product.name%> <%= "(" + variant_options(item.variant) + ")" unless item.variant .option_values.empty? %></td>
       <td class="price"><%= number_to_currency item.price %></td>
+      <td> REM </td>
+      <td> DISC </td>
     </tr>
   <% end %>
   <tr class="total" id="subtotal-row">
     <td colspan="2"><b><%= t('subtotal') %>:</b></td>
-    <td class="total"><span><%= number_to_currency @order.item_total %></span></td>
+    <td colspan="2" class="total"><span><%= number_to_currency @order.item_total %></span></td>
   </tr>
   <% @order.adjustments.each do |adjustment| %>
     <tr class="total">
       <td colspan="2"><strong><%= adjustment.label %></strong></td>
-      <td class="total"><span><%= number_to_currency adjustment.amount %></span></td>
+      <td colspan="2" class="total"><span><%= number_to_currency adjustment.amount %></span></td>
     </tr>
   <% end %>
   <tr class="total">
     <td colspan="2"><b><%= t('order_total') %>:</b></td>
-    <td class="total"><span id="order_total"><%= number_to_currency @order.total %></span></td>
+    <td colspan="2" class="total"><span id="order_total"><%= number_to_currency @order.total %></span></td>
   </tr>
 </table>
-
+<br/>
+<br/>
+<a href="javascript:poptastic('/admin/pos/print');">Print</a>
+<a href="javascript:if (newwindow) newwindow.close()">Close Print</a>  
+<a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">New Customer</a>  
