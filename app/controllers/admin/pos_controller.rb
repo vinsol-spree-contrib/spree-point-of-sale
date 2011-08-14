@@ -3,7 +3,7 @@ class Admin::PosController < Admin::BaseController
   
 
   def new
-    session[:order] = []
+    session[:items] = []
     redirect_to :action => :index
   end
 

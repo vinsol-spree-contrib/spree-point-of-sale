@@ -6,6 +6,6 @@ Rails.application.routes.draw do
     match "pos/print" => "pos#print"
     match "pos" => "pos#index"
   end
-  match '/admin' => 'admin/pos#index', :as => :admin
+#  match '/admin' => 'admin/pos#index', :as => :admin
 end
 
