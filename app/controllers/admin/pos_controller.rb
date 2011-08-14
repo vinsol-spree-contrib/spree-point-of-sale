@@ -78,6 +78,16 @@ class Admin::PosController < Admin::BaseController
   def init_search
     params[:search] ||= {}
     params[:search][:meta_sort] ||= "name.asc"
+    puts "NAME -#{params[:search][:variants_including_master_sku_contains][0,3] if params[:search][:variants_including_master_sku_contains]}-"
+    if params[:search][:variants_including_master_sku_contains] 
+      if params[:search][:variants_including_master_sku_contains][0] == 80 and
+        params[:search][:variants_including_master_sku_contains][1] != 45
+        s = params[:search][:variants_including_master_sku_contains]
+        s[0,3] = "P-" # fix some encoding error of american scanner in europe
+        params[:search][:variants_including_master_sku_contains] = s
+      end
+    end
+    puts "NAME2 -#{params[:search][:variants_including_master_sku_contains][0,3] if params[:search][:variants_including_master_sku_contains]}-"
     @search = Product.metasearch(params[:search])
 
     pagination_options = {:include   => {:variants => [:images, :option_values]},
