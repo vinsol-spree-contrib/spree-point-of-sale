@@ -38,15 +38,19 @@ class Admin::PosController < Admin::BaseController
       new_item.price = price.to_s 
       order.line_items << new_item
     end
-    order.shipping_method = ShippingMethod.find_by_name "nouto"
+    if id_or_name = Spree::Config[:pos_shipping]
+      method = ShippingMethod.find_by_name id_or_name
+      method = ShippingMethod.find_by_id(id_or_name) unless method
+    end
+    order.shipping_method = method || ShippingMethod.first
     order.create_shipment!
     TaxRate.all.each do |rate|
       rate.create_adjustment( rate.tax_category.description , order, order, true)
     end
     payment = Payment.new( :payment_method => PaymentMethod.find_by_type( "PaymentMethod::Check") , 
               :amount => order.total , :order_id => order.id )
-    payment.complete
     payment.save!
+    payment.payment_source.capture(payment)
     order.state = "complete"
     order.completed_at = Time.now
     order.save!
@@ -59,18 +63,13 @@ class Admin::PosController < Admin::BaseController
   end
   
   def find
-    if @products.length == 1
-      add_product @products.first 
-      redirect_to :action => :index
-    else
-      if params[:index]
-        search = params[:search]
-        search["name_contains"] = search["variants_including_master_sku_contains"]
-        search["variants_including_master_sku_contains"] = nil
-        init_search
-      end
-      render :find
+    if params[:index]
+      search = params[:search]
+      search["name_contains"] = search["variants_including_master_sku_contains"]
+      search["variants_including_master_sku_contains"] = nil
+      init_search
     end
+    render :find
   end
     
   private
@@ -83,7 +82,6 @@ class Admin::PosController < Admin::BaseController
   def init_search
     params[:search] ||= {}
     params[:search][:meta_sort] ||= "name.asc"
-    puts "NAME -#{params[:search][:variants_including_master_sku_contains][0,3] if params[:search][:variants_including_master_sku_contains]}-"
     if params[:search][:variants_including_master_sku_contains] 
       if params[:search][:variants_including_master_sku_contains][0] == 80 and
         params[:search][:variants_including_master_sku_contains][1] != 45
@@ -92,7 +90,6 @@ class Admin::PosController < Admin::BaseController
         params[:search][:variants_including_master_sku_contains] = s
       end
     end
-    puts "NAME2 -#{params[:search][:variants_including_master_sku_contains][0,3] if params[:search][:variants_including_master_sku_contains]}-"
     @search = Product.metasearch(params[:search])
 
     pagination_options = {:include   => {:variants => [:images, :option_values]},
