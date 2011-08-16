@@ -3,7 +3,26 @@ class Admin::PosController < Admin::BaseController
   
 
   def new
-    session[:items] = []
+    session[:items] = {}
+    redirect_to :action => :index
+  end
+
+  
+  def add
+    if pid = params[:item]
+      prod =  Product.find pid
+      var = prod.class == Product ? prod.master : prod 
+      session[:items][ var.id.to_s ] = var.price 
+      flash.notice = t('product_added')
+    end
+    redirect_to :action => :index
+  end
+
+  def remove
+    if pid = params[:item]
+      session[:items].delete( pid )
+      flash.notice = t('product_removed') 
+    end
     redirect_to :action => :index
   end
 
@@ -36,15 +55,6 @@ class Admin::PosController < Admin::BaseController
   
   def index
     puts "PROD #{@products.length}"
-    
-    if pid = params[:add]
-      add_product Product.find pid
-      flash.notice = t('product_added')
-    end
-    if pid = params[:remove]
-      remove_product pid
-      flash.notice = t('product_removed')
-    end
     render :index
   end
   
@@ -65,13 +75,8 @@ class Admin::PosController < Admin::BaseController
     
   private
 
-  def add_product prod
-    var = prod.class == Product ? prod.master : prod 
-    @items << [ var.id , var.price ]
-    session[:items] = @items
-  end
   def load
-    @items = session[:items] || []
+    @items = session[:items] || {}
     init_search
   end
   

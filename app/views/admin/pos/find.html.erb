@@ -6,6 +6,7 @@
           <th><%= t("sku") %></th>
           <th><%= sort_link @search,:name, t("name"), {}, {:title => 'admin_products_listing_name_title'} %></th>
           <th><%= sort_link @search,:master_price, t("master_price") %></th>
+          <th><%= t("select") %></th>
       </tr>
       <% @products.each do |product| %>
         <tr <%= 'style="color:red;"' if product.deleted? %> id="<%= dom_id product %>">
@@ -13,7 +14,7 @@
           <td><%= product.name %></td>
           <td><%= product.price %></td>
           <td class="actions">
-              <%= link_to  "Select" , "/admin/pos/index?add=#{product.id}" %>
+              <%= link_to( image_tag('/images/print/select.jpg'), "/admin/pos/add/#{product.id}") %>
           </td>
         </tr>
       <% end %>

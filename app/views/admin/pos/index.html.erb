@@ -10,7 +10,7 @@ function poptastic(url)
 </SCRIPT>
 <% end %>
 <%= render 'shared/error_messages', :target => @pos %>
-<div id="add-line-item">
+<div class="search">
     <legend><%= t('add_product') %>  </legend>
     
     <%= form_for [:admin, :pos ,  @search] do |f| %>
@@ -24,7 +24,11 @@ function poptastic(url)
       </div>
     <% end %>
 </div>        
-
+<div class="right">
+  <a href="javascript:poptastic('/admin/pos/print');"> <img src="/images/print/print.gif" alt="Print"/> </a>
+  <a href="javascript:if (newwindow) newwindow.close()"><img src="/images/print/close_print.gif" alt="Close Print"/></a>  
+  <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()"><img src="/images/print/customer.gif" alt="New Customer"/></a>  
+</div>
 <table class="index">
   <tr>
     <th><%= t('item_description') %></th>
@@ -33,12 +37,12 @@ function poptastic(url)
     <th><%= t('discount') %></th>
   </tr>
 
-  <% @items.each do |id , price | 
+  <% @items.each do | id , price | 
     variant = Variant.find id %>
     <tr>
       <td width="300"><%=variant.name%> <%= "(" + variant_options(variant) + ")" unless variant .option_values.empty? %></td>
       <td class="price"><%= number_to_currency price %></td>
-      <td> REM </td>
+      <td> <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
       <td> DISC </td>
     </tr>
   <% end %>
@@ -49,7 +53,3 @@ function poptastic(url)
   </tr>
 </table>
 <br/>
-<br/>
-<a href="javascript:poptastic('/admin/pos/print');">Print</a>
-<a href="javascript:if (newwindow) newwindow.close()">Close Print</a>  
-<a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">New Customer</a>  
