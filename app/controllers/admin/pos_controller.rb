@@ -59,8 +59,18 @@ class Admin::PosController < Admin::BaseController
   
   def index
     puts "PROD #{@products.length}"
-    if pid = params[:item]
+    if pid = params[:price]
       session[:items][pid] = params["price#{pid}"].to_f
+    end
+    if discount = params[:discount]
+      pids = params[:item] ? [params[:item]] : session[:items].keys
+      pids.each do |pid|
+        if discount == "0" #reset
+          session[:items][pid] = Variant.find(pid).price
+        else
+          session[:items][pid] = (100.0 - discount.to_f) * session[:items][pid] / 100.0 
+        end
+      end
     end
     render :index
   end

@@ -31,6 +31,10 @@ document.forms['product_search'].elements['search[variants_including_master_sku_
   <a href="javascript:poptastic('/admin/pos/print');"> <img src="/images/print/print.gif" alt="Print"/> </a>
   <a href="javascript:if (newwindow) newwindow.close()"><img src="/images/print/close_print.gif" alt="Close Print"/></a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()"><img src="/images/print/customer.gif" alt="New Customer"/></a>  
+   Discount <% [5,10,15,20,25].each do |i| %>
+    <%= link_to i.to_s , :discount => i  %>
+    <%end%> 
+    <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0" %>
 </div>
 <table class="index">
   <tr>
@@ -45,13 +49,17 @@ document.forms['product_search'].elements['search[variants_including_master_sku_
     <tr>
       <td width="300"><%=variant.name%> <%= "(" + variant_options(variant) + ")" unless variant .option_values.empty? %></td>
       <td class="price"><%= form_tag do %> 
-                  <%= hidden_field_tag(:item, id)   %>
+                  <%= hidden_field_tag(:price, id)   %>
                   <input type="submit" style="display:none"/>
                   <%= text_field_tag "price#{id}" , price , :onclick => "this.form.price#{id}.select()" , 
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
       <td> <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
-      <td> DISC </td>
+      <td> <% [5,10,15,20,25].each do |i| %>
+        <%= link_to i.to_s , :discount => i , :item => id %>
+        <%end%> 
+        <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
+      </td>
     </tr>
   <% end %>
 
