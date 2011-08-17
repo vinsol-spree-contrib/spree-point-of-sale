@@ -59,6 +59,9 @@ class Admin::PosController < Admin::BaseController
   
   def index
     puts "PROD #{@products.length}"
+    if pid = params[:item]
+      session[:items][pid] = params["price#{pid}"].to_f
+    end
     render :index
   end
   
