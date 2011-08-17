@@ -9,33 +9,36 @@ function poptastic(url)
 //-->
 </SCRIPT>
 <% end %>
-<%= render 'shared/error_messages', :target => @pos %>
-<div class="search">
-    <legend><%= t('add_product') %>  </legend>
-    
-    <%= form_for [:admin, :pos ,  @search]  do |f| %>
-    <input type="hidden" value="1" name="index">
-      <div class="box">
-        <p>
-          <%= f.label :variants_including_master_sku_contains, t("sku") %><br />
-          <%= f.text_field :variants_including_master_sku_contains, :size => 15 %>
-          <%= button t("search") %>
-        </p>
-      </div>
-    <% end %>
-</div>        
-<script type="text/javascript" language="JavaScript">
-document.forms['product_search'].elements['search[variants_including_master_sku_contains]'].focus();
-</script>
-<div class="right">
+<% content_for :sidebar do %>
+  <div class="search">
+      <legend><%= t('add_product') %>  </legend>
+
+      <%= form_for [:admin, :pos ,  @search]  do |f| %>
+      <input type="hidden" value="1" name="index">
+        <div class="box">
+          <p>
+            <%= f.label :variants_including_master_sku_contains, t("sku") %><br />
+            <%= f.text_field :variants_including_master_sku_contains, :size => 15 %>
+            <%= button t("search") %>
+          </p>
+        </div>
+      <% end %>
+  </div>        
+  <script type="text/javascript" language="JavaScript">
+  document.forms['product_search'].elements['search[variants_including_master_sku_contains]'].focus();
+  </script>
+  <div class="right">
+     Discount kaikkille <big> <% [5,10,15,20,25].each do |i| %> &nbsp;
+      <%= link_to i.to_s , :discount => i  %> 
+      <%end%> </big>
+      <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0" %>
+  </div><br/>
   <a href="javascript:poptastic('/admin/pos/print');"> <img src="/images/print/print.gif" alt="Print"/> </a>
   <a href="javascript:if (newwindow) newwindow.close()"><img src="/images/print/close_print.gif" alt="Close Print"/></a>  
-  <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()"><img src="/images/print/customer.gif" alt="New Customer"/></a>  
-   Discount <% [5,10,15,20,25].each do |i| %>
-    <%= link_to i.to_s , :discount => i  %>
-    <%end%> 
-    <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0" %>
-</div>
+  <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
+    <img src="/images/print/customer.gif" alt="New Customer"/></a>  <br/>
+<%end%>
+<%= render 'shared/error_messages', :target => @pos %>
 <table class="index">
   <tr>
     <th><%= t('item_description') %></th>
@@ -55,9 +58,9 @@ document.forms['product_search'].elements['search[variants_including_master_sku_
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
       <td> <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
-      <td> <% [5,10,15,20,25].each do |i| %>
+      <td><big>  <% [5,10,15,20,25].each do |i| %>&nbsp;
         <%= link_to i.to_s , :discount => i , :item => id %>
-        <%end%> 
+        <%end%></big> 
         <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
       </td>
     </tr>

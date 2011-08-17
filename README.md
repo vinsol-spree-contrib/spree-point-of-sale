@@ -3,11 +3,15 @@ SpreePos
 
 A Point Of Sale (POS) screen for Spree.
 
-POS screen hooks into the Admin Tabs and is mean to be used with a touchscreen (ie big fonts etc).
+POS screen hooks into the Admin Tabs and is meant to be used with a touchscreen (ie big fonts etc).
 
 Basic Bar scanner input (sku search) or search by name. No Customer, no shipping, no coupons...
 
-Allows for adjustment of line item prices and percentage discount of total 
+Allows for adjustment of line item prices and discount percentage of items and total 
+
+An actual Order is only created when you press print. 
+
+Pressing new will abandon the current sale. Also, there is no way to get to the pos screen from an existing order, if those need to be edited, do so in the orders tab.
 
 Configure
 =========
@@ -23,13 +27,15 @@ Dependencies
 ============
 None..... but
 
-Pos relies on html-invoice to print a receipt. The dependency is not made explicit in case you don't need receipts. If you do add spree-html-invoice to your gemfile and you _will_ want to configure the look of the receipt.
+Pos relies on html-invoice to print a receipt. The dependency is not made explicit in case you don't need receipts. If you do add spree-html-invoice to your gemfile you _will_ want to configure the look of the receipt.
+
+You can install spree-product-barcodes to print product labels if need be. Otherwise use the existing upc barcodes on the products and scan them into the sku.
 
 ToDo
 ====
-I'm just starting and THIS IS NOT READY, especially not for use.
+I'm just starting and this is just starting to get there (I'm not even using it).
 
-discounts and adjustments missing
+TAXES will be a surprise for ANYONE (vat/sales , still working on it...)
 
 Installation
 =======
