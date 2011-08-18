@@ -28,11 +28,11 @@ function poptastic(url)
   document.forms['product_search'].elements['search[variants_including_master_sku_contains]'].focus();
   </script>
   <div class="right">
-     Discount kaikkille <big> <% [5,10,15,20,25].each do |i| %> &nbsp;
-      <%= link_to i.to_s , :discount => i  %> 
-      <%end%> </big>
-      <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0" %>
-  </div><br/>
+     Discount<br/>  <% [5,10,15,20,25].each do |i| %> 
+      <%= link_to image_tag("/images/print/#{i}.jpg") , :discount => i  %> 
+      <%end%> 
+      <%= link_to image_tag("/images/print/delete.png") , "/admin/pos/index?discount=0" %>
+  </div><br/><br/><br/>
   <a href="javascript:poptastic('/admin/pos/print');"> <img src="/images/print/print.gif" alt="Print"/> </a>
   <a href="javascript:if (newwindow) newwindow.close()"><img src="/images/print/close_print.gif" alt="Close Print"/></a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
@@ -50,7 +50,9 @@ function poptastic(url)
   <% @items.each do | id , price | 
     variant = Variant.find id %>
     <tr>
-      <td width="300"><%=variant.name%> <%= "(" + variant_options(variant) + ")" unless variant .option_values.empty? %></td>
+      <td width="300">
+        <%=  image_tag variant.product.images.first.attachment.url(:mini) %>
+      <%=variant.name%> <%= "(" + variant_options(variant) + ")" unless variant .option_values.empty? %></td>
       <td class="price"><%= form_tag do %> 
                   <%= hidden_field_tag(:price, id)   %>
                   <input type="submit" style="display:none"/>
@@ -58,10 +60,10 @@ function poptastic(url)
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
       <td> <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
-      <td><big>  <% [5,10,15,20,25].each do |i| %>&nbsp;
-        <%= link_to i.to_s , :discount => i , :item => id %>
+      <td><big>  <% [5,10,15,20,25].each do |i| %>
+        <%= link_to image_tag("/images/print/#{i}.jpg") , :discount => i , :item => id %>
         <%end%></big> 
-        <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
+        <%= link_to image_tag("/images/print/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
       </td>
     </tr>
   <% end %>

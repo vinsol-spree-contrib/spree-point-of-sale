@@ -13,7 +13,7 @@ class Admin::PosController < Admin::BaseController
       prod =  Product.find pid
       var = prod.class == Product ? prod.master : prod 
       session[:items][ var.id.to_s ] = var.price 
-      flash.notice = t('product_added')
+      #flash.notice = t('product_added')
     end
     redirect_to :action => :index
   end
