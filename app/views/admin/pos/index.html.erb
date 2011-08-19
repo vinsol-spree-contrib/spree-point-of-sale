@@ -29,14 +29,14 @@ function poptastic(url)
   </script>
   <div class="right">
      Discount<br/>  <% [5,10,15,20,25].each do |i| %> 
-      <%= link_to image_tag("/images/print/#{i}.jpg") , :discount => i  %> 
+      <%= link_to image_tag("/images/print/#{i}.png") , :discount => i  %> 
       <%end%> 
       <%= link_to image_tag("/images/print/delete.png") , "/admin/pos/index?discount=0" %>
   </div><br/><br/><br/>
-  <a href="javascript:poptastic('/admin/pos/print');"> <img src="/images/print/print.gif" alt="Print"/> </a>
-  <a href="javascript:if (newwindow) newwindow.close()"><img src="/images/print/close_print.gif" alt="Close Print"/></a>  
+  <a href="javascript:poptastic('/admin/pos/print');"> <img src="/images/print/print.png" alt="Print"/> </a>
+  <a href="javascript:if (newwindow) newwindow.close()"><img src="/images/print/close_print.png" alt="Close Print"/></a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
-    <img src="/images/print/customer.gif" alt="New Customer"/></a>  <br/>
+    <img src="/images/print/customer.png" alt="New Customer"/></a>  <br/>
 <%end%>
 <%= render 'shared/error_messages', :target => @pos %>
 <table class="index">
@@ -60,10 +60,10 @@ function poptastic(url)
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
       <td> <%= link_to image_tag("/images/admin/icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
-      <td><big>  <% [5,10,15,20,25].each do |i| %>
-        <%= link_to image_tag("/images/print/#{i}.jpg") , :discount => i , :item => id %>
+      <td><big>  <% [5,10,15,20,25].each do |i| %>&nbsp;
+        <%= link_to image_tag("/images/print/#{i}.png") , :discount => i , :item => id %>
         <%end%></big> 
-        <%= link_to image_tag("/images/print/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
+        &nbsp;&nbsp;<%= link_to image_tag("/images/print/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
       </td>
     </tr>
   <% end %>

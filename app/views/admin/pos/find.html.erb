@@ -11,7 +11,7 @@
       <% @products.each do |product| %>
         <tr <%= 'style="color:red;"' if product.deleted? %> id="<%= dom_id product %>">
           <td> <%=  image_tag product.images.first.attachment.url(:mini) %></td>
-          <td> <%= product.name %> <br> <%== product.description[0 .. 200]  %></td>
+          <td> <b> <%= product.name %> </b> <br> <%== product.description[0 .. 200]  %></td>
           <td><%= product.price %></td>
           <td class="actions">
               <%= link_to( image_tag('/images/print/select.jpg'), "/admin/pos/add/#{product.id}") %>
