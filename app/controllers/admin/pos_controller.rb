@@ -1,19 +1,13 @@
 class Admin::PosController < Admin::BaseController
-  before_filter :load 
-  
 
   def new
     session[:items] = {}
     redirect_to :action => :index
   end
 
-  
   def add
     if pid = params[:item]
-      prod =  Product.find pid
-      var = prod.class == Product ? prod.master : prod 
-      session[:items][ var.id.to_s ] = var.price 
-      #flash.notice = t('product_added')
+      add_product Product.find pid
     end
     redirect_to :action => :index
   end
@@ -30,7 +24,7 @@ class Admin::PosController < Admin::BaseController
     order = Order.new
     order.email = current_user.email
     order.save!
-    @items.each do |idd , price |
+    session[:items].each do |idd , price |
       var = Variant.find(idd)
       puts "Variant #{var.name} #{idd}"
       new_item = LineItem.new(:quantity => 1 )
@@ -58,7 +52,6 @@ class Admin::PosController < Admin::BaseController
   end
   
   def index
-    puts "PROD #{@products.length}"
     if pid = params[:price]
       session[:items][pid] = params["price#{pid}"].to_f
     end
@@ -72,10 +65,20 @@ class Admin::PosController < Admin::BaseController
         end
       end
     end
+    if sku = params[:sku]
+      prods = Variant.where(:sku => sku ).limit(5)
+      if prods.length == 1
+        add_product prods.first
+      else
+        redirect_to :action => :find , "search[name_contains]" => sku
+        return
+      end
+    end
     render :index
   end
   
   def find
+    init_search
     if params[:index]
       search = params[:search]
       search["name_contains"] = search["variants_including_master_sku_contains"]
@@ -86,23 +89,16 @@ class Admin::PosController < Admin::BaseController
   end
     
   private
-
-  def load
-    @items = session[:items] || {}
-    init_search
+  
+  def add_product prod
+    var = prod.class == Product ? prod.master : prod 
+    session[:items][ var.id.to_s ] = var.price 
+    #flash.notice = t('product_added')
   end
   
   def init_search
     params[:search] ||= {}
     params[:search][:meta_sort] ||= "name.asc"
-    if params[:search][:variants_including_master_sku_contains] 
-      if params[:search][:variants_including_master_sku_contains][0] == 80 and
-        params[:search][:variants_including_master_sku_contains][1] != 45
-        s = params[:search][:variants_including_master_sku_contains]
-        s[0,3] = "P-" # fix some encoding error of american scanner in europe
-        params[:search][:variants_including_master_sku_contains] = s
-      end
-    end
     @search = Product.metasearch(params[:search])
 
     pagination_options = {:include   => {:variants => [:images, :option_values]},
