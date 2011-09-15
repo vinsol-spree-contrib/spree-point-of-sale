@@ -90,8 +90,10 @@ class Admin::PosController < Admin::BaseController
     
   private
   
+  
   def add_product prod
     var = prod.class == Product ? prod.master : prod 
+    session[:items] = {} unless session[:items]
     session[:items][ var.id.to_s ] = var.price 
     #flash.notice = t('product_added')
   end
@@ -101,11 +103,7 @@ class Admin::PosController < Admin::BaseController
     params[:search][:meta_sort] ||= "name.asc"
     @search = Product.metasearch(params[:search])
 
-    pagination_options = {:include   => {:variants => [:images, :option_values]},
-                          :per_page  => 20 ,
-                          :page      => params[:page]}
-
-    @products = @search.relation.group_by_products_id.paginate(pagination_options)
+    @products = @search.relation.group_by_products_id.includes(:variants => [:images, :option_values]).page(params[:page]).per(20)
   end
 end
 

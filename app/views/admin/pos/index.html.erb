@@ -29,14 +29,15 @@ function poptastic(url)
   </script>
   <div class="right">
      Discount<br/>  <% [5,10,15,20,25].each do |i| %> 
-      <%= link_to image_tag("print/#{i}.png") , :discount => i  %> 
+      <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i  %> 
       <%end%> 
-      <%= link_to image_tag("print/delete.png") , "/admin/pos/index?discount=0" %>
+      <%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/index?discount=0" %>
   </div><br/><br/><br/>
-  <a href="javascript:poptastic('/admin/pos/print');"> <img src="print/print.png" alt="Print"/> </a>
-  <a href="javascript:if (newwindow) newwindow.close()"><img src="print/close_print.png" alt="Close Print"/></a>  
+  <a href="javascript:poptastic('/admin/pos/print');return;" alt="Print"/>
+        <%= image_tag "admin/pos/print.png" %>  </a>
+  <a href="javascript:if (newwindow) newwindow.close()"><%= image_tag "admin/pos/close_print.png" , :alt => "Close Print" %> </a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
-    <img src="print/customer.png" alt="New Customer"/></a>  <br/>
+    <%= image_tag "admin/pos/customer.png" , :alt => "New Customer" %> </a>  <br/>
 <%end%>
 <%= render 'shared/error_messages', :target => @pos %>
 <table class="index">
@@ -59,11 +60,11 @@ function poptastic(url)
                   <%= text_field_tag "price#{id}" , price , :onclick => "this.form.price#{id}.select()" , 
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
-      <td> <%= link_to image_tag("admin/icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
+      <td> <%= link_to image_tag("icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
       <td><big>  <% [5,10,15,20,25].each do |i| %>&nbsp;
-        <%= link_to image_tag("print/#{i}.png") , :discount => i , :item => id %>
+        <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i , :item => id %>
         <%end%></big> 
-        &nbsp;&nbsp;<%= link_to image_tag("print/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
+        &nbsp;&nbsp;<%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
       </td>
     </tr>
   <% end %>

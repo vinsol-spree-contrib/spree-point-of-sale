@@ -14,16 +14,16 @@
           <td> <b> <%= product.name %> </b> <br> <%== product.description[0 .. 200]  %></td>
           <td><%= product.price %></td>
           <td class="actions">
-              <%= link_to( image_tag('print/select.jpg'), "/admin/pos/add/#{product.id}") %>
+              <%= link_to( image_tag('admin/pos/select.jpg'), "/admin/pos/add/#{product.id}") %>
           </td>
         </tr>
       <% end %>
     </table>
     <% @pos = @products %>
-    <%= will_paginate(:previous_label => "&#171; #{t('previous')}", :next_label => "#{t('next')} &#187;") %>
     </td>
   </tr>
 </table>
+<%= paginate @products %>
 
 <% content_for :sidebar do %>
   <%= form_for [:admin, :pos ,  @search] do |f| %>
