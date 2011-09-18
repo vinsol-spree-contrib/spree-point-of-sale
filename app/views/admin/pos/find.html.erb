@@ -4,50 +4,50 @@
     <table class="index" id='listing_products'>
       <tr>
           <th><%= t("image") %></th>
-          <th><%= sort_link @search,:name, t("name"), {}, {:title => 'admin_products_listing_name_title'} %></th>
-          <th><%= sort_link @search,:master_price, t("master_price") %></th>
+          <th><%= sort_link @search,:product_name, t("name"), {}, {:title => 'admin_products_listing_name_title'} %></th>
+          <th><%= sort_link @search,:price, t("master_price") %></th>
           <th><%= t("select") %></th>
       </tr>
-      <% @products.each do |product| %>
-        <tr <%= 'style="color:red;"' if product.deleted? %> id="<%= dom_id product %>">
-          <td> <%=  image_tag product.images.first.attachment.url(:mini) if product.images.first%></td>
-          <td> <b> <%= product.name %> </b> <br> <%== product.description[0 .. 200]  %></td>
-          <td><%= product.price %></td>
+      <% @variants.each do |variant| %>
+        <tr <%= 'style="color:red;"' if variant.deleted? %> id="<%= dom_id variant %>">
+          <td> <%=  image_tag variant.images.first.attachment.url(:mini) if variant.images.first%></td>
+          <td> <b> <%= variant.name %> </b> <%= variant.options_text %><br> <%== variant.description[0 .. 200]  %></td>
+          <td><%= variant.price %></td>
           <td class="actions">
-              <%= link_to( image_tag('admin/pos/select.jpg'), "/admin/pos/add/#{product.id}") %>
+              <%= link_to( image_tag('admin/pos/select.jpg'), "/admin/pos/add/#{variant.id}") %>
           </td>
         </tr>
       <% end %>
     </table>
-    <% @pos = @products %>
+    <% @pos = @variants %>
     </td>
   </tr>
 </table>
-<%= paginate @products %>
+<%= paginate @variants %>
 
 <% content_for :sidebar do %>
   <%= form_for [:admin, :pos ,  @search] do |f| %>
     <div class="box">
       <h3><%= t(:search) %></h3>
       <p>
-        <%= f.label :name_contains, t("name") %><br />
-        <%= f.text_field :name_contains, :size => 15 %>
+        <%= f.label :product_name_contains, t("name") %><br />
+        <%= f.text_field :product_name_contains, :size => 15 %>
       </p>
       <p>
-        <%= f.label :description_contains, t("description") %><br />
-        <%= f.text_field :description_contains, :size => 15 %>
+        <%= f.label :product_description_contains, t("description") %><br />
+        <%= f.text_field :product_description_contains, :size => 15 %>
       </p>
       <p>
-        <%= f.label :variants_including_master_sku_contains, t("sku") %><br />
-        <%= f.text_field :variants_including_master_sku_contains, :size => 15 %>
+        <%= f.label :sku_contains, t("sku") %><br />
+        <%= f.text_field :sku_contains, :size => 15 %>
       </p>
       <p>
-        <%= f.label :variants_including_master_price_less_than, t("price_min") %><br />
-        <%= f.text_field :variants_including_master_price_less_than, :size => 15 %>
+        <%= f.label :price_less_than, t("price_min") %><br />
+        <%= f.text_field :price_less_than, :size => 15 %>
       </p>
       <p>
-        <%= f.label :variants_including_master_price_gte, t("price_max") %><br />
-        <%= f.text_field :variants_including_master_price_gte, :size => 15 %>
+        <%= f.label :price_gte, t("price_max") %><br />
+        <%= f.text_field :price_gte, :size => 15 %>
       </p>
 
       <p class="form-buttons">

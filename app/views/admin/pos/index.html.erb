@@ -52,8 +52,8 @@ function poptastic(url)
     variant = Variant.find id %>
     <tr>
       <td width="300">
-        <%=  image_tag variant.product.images.first.attachment.url(:mini) %>
-      <%=variant.name%> <%= "(" + variant_options(variant) + ")" unless variant .option_values.empty? %></td>
+        <%=  image_tag variant.product.images.first.attachment.url(:mini) if variant.product.images.first %>
+      <%=variant.name%>  <%=  variant.options_text %></td>
       <td class="price"><%= form_tag do %> 
                   <%= hidden_field_tag(:price, id)   %>
                   <input type="submit" style="display:none"/>

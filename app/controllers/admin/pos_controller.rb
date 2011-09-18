@@ -7,7 +7,7 @@ class Admin::PosController < Admin::BaseController
 
   def add
     if pid = params[:item]
-      add_product Product.find pid
+      add_product Variant.find pid
     end
     redirect_to :action => :index
   end
@@ -70,7 +70,7 @@ class Admin::PosController < Admin::BaseController
       if prods.length == 1
         add_product prods.first
       else
-        redirect_to :action => :find , "search[name_contains]" => sku
+        redirect_to :action => :find , "search[product_name_contains]" => sku
         return
       end
     end
@@ -100,10 +100,10 @@ class Admin::PosController < Admin::BaseController
   
   def init_search
     params[:search] ||= {}
-    params[:search][:meta_sort] ||= "name.asc"
-    @search = Product.metasearch(params[:search])
+    params[:search][:meta_sort] ||= "product_name.asc"
+    @search = Variant.metasearch(params[:search])
 
-    @products = @search.relation.group_by_products_id.includes(:variants => [:images, :option_values]).page(params[:page]).per(20)
+    @variants = @search.relation.page(params[:page]).per(20)
   end
 end
 

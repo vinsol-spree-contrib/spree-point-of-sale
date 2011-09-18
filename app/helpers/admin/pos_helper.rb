@@ -1,6 +1,6 @@
 module Admin::PosHelper
 
-  def admin_pos_products_path
+  def admin_pos_variants_path
     "/admin/pos/find"
   end
   
