@@ -53,7 +53,7 @@ function poptastic(url)
     <tr>
       <td width="300">
         <%=  image_tag variant.product.images.first.attachment.url(:mini) if variant.product.images.first %>
-      <%=variant.name%>  <%=  variant.options_text %></td>
+      <%= link_to( "#{variant.name} #{variant.options_text}" , edit_admin_product_url(variant.product)) %></td>
       <td class="price"><%= form_tag do %> 
                   <%= hidden_field_tag(:price, id)   %>
                   <input type="submit" style="display:none"/>
