@@ -36,9 +36,9 @@ class Admin::PosController < Admin::BaseController
       end
       order.shipping_method = method || ShippingMethod.first
       order.create_shipment!
-      TaxRate.all.each do |rate|
-        rate.create_adjustment( rate.tax_category.description , order, order, true)
-      end
+#      TaxRate.all.each do |rate|
+#        rate.create_adjustment( rate.tax_category.description , order, order, true)
+#      end
     end
     session[:items].each do |idd , price |
       var = Variant.find(idd)
