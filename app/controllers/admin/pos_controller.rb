@@ -36,9 +36,6 @@ class Admin::PosController < Admin::BaseController
       end
       order.shipping_method = method || ShippingMethod.first
       order.create_shipment!
-#      TaxRate.all.each do |rate|
-#        rate.create_adjustment( rate.tax_category.description , order, order, true)
-#      end
     end
     session[:items].each do |idd , price |
       var = Variant.find(idd)
@@ -77,7 +74,10 @@ class Admin::PosController < Admin::BaseController
       end
     end
     if sku = params[:sku]
-      prods = Variant.where(:sku => sku ).limit(5)
+      prods = Variant.where(:sku => sku ).limit(2)
+      if prods.length == 0 #needed?  and Variant.first.respond_to?(:ean)
+        prods = Variant.where(:ean => sku ).limit(2)
+      end
       if prods.length == 1
         add_product prods.first
       else
