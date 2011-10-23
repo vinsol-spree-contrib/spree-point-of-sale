@@ -15,8 +15,14 @@ class Admin::PosController < Admin::BaseController
 
   def remove
     if pid = params[:item]
-      session[:items].delete( pid )
-      flash.notice = t('product_removed') 
+      if( item = session[:items][pid] )
+        if item.quantity > 1 
+          item.quantity = item.quantity - 1
+        else
+          session[:items].delete( pid )
+        end
+        flash.notice = t('product_removed') 
+      end
     end
     redirect_to :action => :index
   end
@@ -37,12 +43,12 @@ class Admin::PosController < Admin::BaseController
       order.shipping_method = method || ShippingMethod.first
       order.create_shipment!
     end
-    session[:items].each do |idd , price |
-      var = Variant.find(idd)
-      puts "Variant #{var.name} #{idd}"
-      new_item = LineItem.new(:quantity => 1 )
-      new_item.variant = var
-      new_item.price = price.to_s 
+    session[:items].each_value do |item |
+      puts "Variant #{item.variant.name} #{item.id}"
+      new_item = LineItem.new(:quantity => item.quantity  )
+      new_item.variant_id = item.id
+      puts "PRICE #{item.no_tax_price} #{item.no_tax_price.class}"
+      new_item.price = item.no_tax_price
       order.line_items << new_item
     end
     if order_id
@@ -64,18 +70,12 @@ class Admin::PosController < Admin::BaseController
       session[:items][pid] = params["price#{pid}"].to_f
     end
     if discount = params[:discount]
-      pids = params[:item] ? [params[:item]] : session[:items].keys
-      pids.each do |pid|
-        if discount == "0" #reset
-          session[:items][pid] = Variant.find(pid).price
-        else
-          session[:items][pid] = (100.0 - discount.to_f) * session[:items][pid] / 100.0 
-        end
-      end
+      item = session[:items][params[:item]]
+      item.discount( discount )
     end
     if sku = params[:sku]
       prods = Variant.where(:sku => sku ).limit(2)
-      if prods.length == 0 #needed?  and Variant.first.respond_to?(:ean)
+      if prods.length == 0 and Variant.first.respond_to?(:ean)
         prods = Variant.where(:ean => sku ).limit(2)
       end
       if prods.length == 1
@@ -105,7 +105,9 @@ class Admin::PosController < Admin::BaseController
   def add_product prod
     var = prod.class == Product ? prod.master : prod 
     session[:items] = {} unless session[:items]
-    session[:items][ var.id.to_s ] = var.price 
+    item = session[:items][ var.id.to_s ] || PosItem.new( var )
+    item.quantity = item.quantity + 1
+    session[:items][ var.id.to_s ] = item 
     #flash.notice = t('product_added')
   end
   

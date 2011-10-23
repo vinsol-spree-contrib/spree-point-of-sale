@@ -31,7 +31,7 @@ function poptastic(url)
      Discount<br/>  <% [5,10,15,20,25].each do |i| %> 
       <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i  %> 
       <%end%> 
-      <%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/index?discount=0" %>
+      <%= link_to image_tag("admin/pos/delete_discount.png") , "/admin/pos/index?discount=0" %>
   </div><br/><br/><br/>
   <a href="javascript:poptastic('/admin/pos/print');return;" alt="Print"/>
         <%= image_tag "admin/pos/print.png" %>  </a>
@@ -43,34 +43,36 @@ function poptastic(url)
 <table class="index">
   <tr>
     <th><%= t('item_description') %></th>
+    <th><%= t('quantity') %></th>
     <th class="price"><%= t('price') %></th>
-    <th><%= t('remove') %></th>
+    <th><%= t('remove') + "/"+ t('add') %></th>
     <th><%= t('discount') %></th>
   </tr>
 
-  <% items.each do | id , price | 
-    variant = Variant.find id %>
+  <% items.each_value do | item | %>
     <tr>
       <td width="300">
-        <%=  image_tag variant.product.images.first.attachment.url(:mini) if variant.product.images.first %>
-      <%= link_to( "#{variant.name} #{variant.options_text}" , edit_admin_product_url(variant.product)) %></td>
+        <%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %>
+      <%= link_to( "#{item.variant.name} #{item.variant.options_text}" , edit_admin_product_url(item.variant.product)) %></td>
+      <td> <%=item.quantity%></td>
       <td class="price"><%= form_tag do %> 
-                  <%= hidden_field_tag(:price, id)   %>
+                  <%= hidden_field_tag(:price, item.id)   %>
                   <input type="submit" style="display:none"/>
-                  <%= text_field_tag "price#{id}" , price , :onclick => "this.form.price#{id}.select()" , 
+                  <%= text_field_tag "price#{id}" , item.price , :onclick => "this.form.price#{id}.select()" , 
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
-      <td> <%= link_to image_tag("icons/delete.png") , "/admin/pos/remove/#{id}"  %> </td>
+      <td> <%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/remove/#{item.id}"  %> 
+        <%= link_to image_tag("admin/pos/plus.png") , "/admin/pos/add/#{item.id}"  %> </td>
       <td><big>  <% [5,10,15,20,25].each do |i| %>&nbsp;
-        <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i , :item => id %>
+        <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i , :item => item.id %>
         <%end%></big> 
-        &nbsp;&nbsp;<%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/index?discount=0&item=#{id}" %>   
+        &nbsp;&nbsp;<%= link_to image_tag("admin/pos/delete_discount.png") , "/admin/pos/index?discount=0&item=#{item.id}" %>   
       </td>
     </tr>
   <% end %>
 
   <tr class="total">
-    <td colspan="2"><b><%= t('order_total') %>:</b></td>
+    <td colspan="3"><b><%= t('order_total') %>:</b></td>
     <td colspan="2" class="total"><span id="order_total"><%= number_to_currency item_total %></span></td>
   </tr>
 </table>

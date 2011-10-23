@@ -6,8 +6,8 @@ module Admin::PosHelper
   
   def item_total
     sum = 0 
-    items.each do |id , price|
-      sum += price
+    items.each do |id , item|
+      sum += item.price * item.quantity
     end
     sum
   end 

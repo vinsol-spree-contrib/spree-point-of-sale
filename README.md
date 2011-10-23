@@ -41,9 +41,7 @@ You can install spree-product-barcodes to print product labels if need be. Other
 
 ToDo
 ====
-I'm just starting and this is just starting to get there (I'm not even using it).
-
-TAXES will be a surprise for ANYONE (vat/sales , still working on it...)
+I'm just starting , maybe still rough. Currently works for VAT only.
 
 Installation
 =======
