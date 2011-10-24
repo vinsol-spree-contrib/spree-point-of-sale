@@ -33,7 +33,7 @@ function poptastic(url)
       <%end%> 
       <%= link_to image_tag("admin/pos/delete_discount.png") , "/admin/pos/index?discount=0" %>
   </div><br/><br/><br/>
-  <a href="javascript:poptastic('/admin/pos/print');return;" alt="Print"/>
+  <a href="javascript:poptastic('/admin/pos/print');" alt="Print"/>
         <%= image_tag "admin/pos/print.png" %>  </a>
   <a href="javascript:if (newwindow) newwindow.close()"><%= image_tag "admin/pos/close_print.png" , :alt => "Close Print" %> </a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
