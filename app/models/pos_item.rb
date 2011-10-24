@@ -22,7 +22,7 @@ class PosItem
     if dis == 0.0
       reset_price
     else
-      @price =  ((100.0 - dis) * @price / 100.0).round(2, BigDecimal::ROUND_HALF_UP)
+      @price =  ((100.0 - dis) * @price / 100.0).round(2)
     end
   end
   def reset_price

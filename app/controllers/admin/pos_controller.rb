@@ -72,8 +72,14 @@ class Admin::PosController < Admin::BaseController
       item.price = params["price#{pid}"].to_f
     end
     if discount = params[:discount]
-      item = session[:items][params[:item]]
-      item.discount( discount )
+      if params[:item]
+        item = session[:items][params[:item]]
+        item.discount( discount )
+      else
+        session[:items].each_value do |item|
+          item.discount( discount )
+        end
+      end
     end
     if sku = params[:sku]
       prods = Variant.where(:sku => sku ).limit(2)
