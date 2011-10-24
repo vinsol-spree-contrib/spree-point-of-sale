@@ -66,8 +66,10 @@ class Admin::PosController < Admin::BaseController
   end
   
   def index
-    if pid = params[:price]
-      session[:items][pid] = params["price#{pid}"].to_f
+    if (pid = params[:price]) && request.post?
+      item =  session[:items][pid] 
+      puts "#{session[:items].first[0].class} + item #{item.class}"
+      item.price = params["price#{pid}"].to_f
     end
     if discount = params[:discount]
       item = session[:items][params[:item]]

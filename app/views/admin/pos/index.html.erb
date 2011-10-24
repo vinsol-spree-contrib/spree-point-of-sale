@@ -58,7 +58,8 @@ function poptastic(url)
       <td class="price"><%= form_tag do %> 
                   <%= hidden_field_tag(:price, item.id)   %>
                   <input type="submit" style="display:none"/>
-                  <%= text_field_tag "price#{id}" , item.price , :onclick => "this.form.price#{id}.select()" , 
+                  <%= text_field_tag "price#{item.id}" , item.price , 
+                  :onclick => "this.form.price#{item.id}.select()" , 
                                       :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
                     <% end %></td>
       <td> <%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/remove/#{item.id}"  %> 

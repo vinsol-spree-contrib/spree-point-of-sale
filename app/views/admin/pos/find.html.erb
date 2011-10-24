@@ -18,7 +18,7 @@
           </td>
           <td> <%= link_to( "#{variant.name} #{variant.options_text}" , edit_admin_product_url(variant.product)) %>
           <br> <%== variant.description[0 .. 200]  %></td>
-          <td><%= variant.price %></td>
+          <td><%= variant.tax_price %></td>
           <td class="actions">
               <%= link_to( image_tag('admin/pos/select.jpg'), "/admin/pos/add/#{variant.id}") %>
           </td>

@@ -14,7 +14,7 @@ class PosItem
   end
 
   def price= p
-    @price = p.round(2, BigDecimal::ROUND_HALF_UP)
+    @price = p.round(2)
   end
   
   def discount d
@@ -22,7 +22,7 @@ class PosItem
     if dis == 0.0
       reset_price
     else
-      @price =  (100.0 - dis) * @price / 100.0 
+      @price =  ((100.0 - dis) * @price / 100.0).round(2, BigDecimal::ROUND_HALF_UP)
     end
   end
   def reset_price
@@ -30,6 +30,6 @@ class PosItem
   end
   
   def no_tax_price
-    self.price / (1  + variant.product.effective_tax_rate)
+    (self.price / (1  + variant.product.effective_tax_rate)).round(2)
   end
 end
