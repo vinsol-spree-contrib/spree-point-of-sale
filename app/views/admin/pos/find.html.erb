@@ -48,8 +48,10 @@
         <%= f.text_field :sku_contains, :size => 15 %>
       </p>
       <p>
+        <%if Variant.instance_methods.include? "ean"%>
         <%= f.label :ean_equals, t("ean") %><br />
         <%= f.text_field :ean_equals, :size => 15 %>
+        <% end %>
       </p>
       <p>
         <%= f.label :price_less_than, t("price_min") %><br />
