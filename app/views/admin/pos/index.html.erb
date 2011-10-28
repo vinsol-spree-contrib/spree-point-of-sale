@@ -38,6 +38,15 @@ function poptastic(url)
   <a href="javascript:if (newwindow) newwindow.close()"><%= image_tag "admin/pos/close_print.png" , :alt => "Close Print" %> </a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
     <%= image_tag "admin/pos/customer.png" , :alt => "New Customer" %> </a>  <br/>
+    
+    <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>
+
+    <a href="/admin/pos/inventory">
+      <%= image_tag "admin/pos/inventory_plus.png" , :alt => "Invetory" , :width => 80 , :height => 80 %>  <br/>
+    </a>  
+    <a href="/admin/pos/inventory?as=true">
+      <%= image_tag "admin/pos/inventory.png" , :alt => "Invetory" , :width => 80 , :height => 80 %>  <br/>
+  </a>  
 <%end%>
 <%= render 'shared/error_messages', :target => @pos %>
 <table class="index">
@@ -54,7 +63,10 @@ function poptastic(url)
       <td width="300">
         <%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %>
       <%= link_to( "#{item.variant.name} #{item.variant.options_text}" , edit_admin_product_url(item.variant.product)) %></td>
-      <td> <%=item.quantity%></td>
+      <td> <%= form_tag do %>
+            <%= hidden_field_tag(:quantity_id, item.id) %>
+            <%= select_tag("quantity" , options_for_select( (1..10).to_a , item.quantity), :onchange => 'this.form.submit()')%> 
+        <%end%></td>
       <td class="price"><%= form_tag do %> 
                   <%= hidden_field_tag(:price, item.id)   %>
                   <input type="submit" style="display:none"/>

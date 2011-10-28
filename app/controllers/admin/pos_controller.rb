@@ -6,6 +6,23 @@ class Admin::PosController < Admin::BaseController
     redirect_to :action => :index
   end
 
+  def inventory
+    as = params[:as]
+    num = 0 
+    session[:items].each_value do |item |
+      variant = item.variant
+      num += item.quantity
+      if as
+        variant.on_hand = item.quantity
+      else
+        variant.on_hand += item.quantity
+      end
+      variant.save
+    end
+    flash.notice = "Total of #{num} items added for #{session[:items].length} products "     
+    self.new
+  end
+  
   def add
     if pid = params[:item]
       add_product Variant.find pid
@@ -70,6 +87,11 @@ class Admin::PosController < Admin::BaseController
       item =  session[:items][pid] 
       puts "#{session[:items].first[0].class} + item #{item.class}"
       item.price = params["price#{pid}"].to_f
+    end
+    if (pid = params[:quantity_id]) && request.post?
+      item =  session[:items][pid] 
+      puts "#{session[:items].first[0].class} + item #{item.class}"
+      item.quantity = params[:quantity].to_i
     end
     if discount = params[:discount]
       if params[:item]

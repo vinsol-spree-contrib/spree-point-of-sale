@@ -8,7 +8,7 @@ module SpreePos
         Rails.env.production? ? require(c) : load(c)
       end
       Deface::Override.new(:virtual_path => "layouts/admin",
-                           :name => "admin_pos_tab",
+                           :name => "Add Pos tab to menu",
                            :insert_bottom => "[data-hook='admin_tabs'], #admin_tabs[data-hook]",
                            :text => " <%= tab :pos %>",
                            :disabled => false)
@@ -19,10 +19,10 @@ module SpreePos
                            :disabled => false)
       if Variant.first and Variant.first.respond_to? :ean
         Deface::Override.new(:virtual_path => "admin/products/_form",
-                             :name => "add_ean_to_products_edit",
+                             :name => "Add ean to product list",
                              :replace => "p:contains('sku')",
                              :text => "<p>
-                                    <%= f.label :sku, t(:sku) %> <%= f.label :ean, t(:ean) %><br>
+                                    <%= f.label :sku, t(:sku) %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= f.label :ean, t(:ean) %><br>
                                     <%= f.text_field :sku, :size => 16 %> <%= f.text_field :ean, :size => 16 %>
                                     </p>",
                              :disabled => false)
