@@ -13,7 +13,7 @@ function poptastic(url)
   <div class="search">
       <legend><%= t('add_product') %>  </legend>
 
-      <%= form_tag "/admin/pos/index"  do  %>
+      <%= form_tag "/admin/pos/index" , :id => "product_search" do  %>
       <input type="hidden" value="1" name="index">
         <div class="box">
           <p>
@@ -25,7 +25,7 @@ function poptastic(url)
       <% end %>
   </div>        
   <script type="text/javascript" language="JavaScript">
-  document.forms['product_search'].elements['search[variants_including_master_sku_contains]'].focus();
+    document.getElementById('sku').focus();
   </script>
   <div class="right">
      Discount<br/>  <% [5,10,15,20,25].each do |i| %> 
