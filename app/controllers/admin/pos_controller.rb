@@ -105,7 +105,7 @@ class Admin::PosController < Admin::BaseController
     end
     if sku = params[:sku]
       prods = Variant.where(:sku => sku ).limit(2)
-      if prods.length == 0 and Variant.first.respond_to?(:ean)
+      if prods.length == 0 and Variant.instance_methods.include? "ean"
         prods = Variant.where(:ean => sku ).limit(2)
       end
       if prods.length == 1
