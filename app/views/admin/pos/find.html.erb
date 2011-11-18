@@ -9,6 +9,7 @@
           <th><%= t("select") %></th>
       </tr>
       <% @variants.each do |variant| %>
+      <% next if variant.is_master and variant.product.has_variants?%>
         <tr <%= 'style="color:red;"' if variant.deleted? %> id="<%= dom_id variant %>">
           <td><% if variant.images.first  %>
               <%= image_tag variant.images.first.attachment.url(:mini) %>

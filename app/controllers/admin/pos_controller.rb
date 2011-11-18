@@ -77,6 +77,7 @@ class Admin::PosController < Admin::BaseController
     payment.payment_source.capture(payment)
     order.state = "complete"
     order.completed_at = Time.now
+    order.finalize!
     order.save!
     session[:pos_order] = order.id
     redirect_to "/admin/invoice/#{order.number}/receipt"
@@ -144,6 +145,7 @@ class Admin::PosController < Admin::BaseController
   def init_search
     params[:search] ||= {}
     params[:search][:meta_sort] ||= "product_name.asc"
+    params[:search][:deleted_at_is_null] = "1"
     @search = Variant.metasearch(params[:search])
 
     @variants = @search.relation.page(params[:page]).per(20)
