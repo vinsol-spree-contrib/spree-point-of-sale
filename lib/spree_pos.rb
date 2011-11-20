@@ -15,7 +15,7 @@ module SpreePos
       Deface::Override.new(:virtual_path => "admin/variants/index",
                            :name => "fix_vat_price",
                            :replace => "td:contains('price')",
-                           :text => "<td><%= product_price variant %></td>",
+                           :text => "<td><%=  variant.tax_price %></td>",
                            :disabled => false)
       if Variant.first and Variant.first.respond_to? :ean
         Deface::Override.new(:virtual_path => "admin/products/_form",

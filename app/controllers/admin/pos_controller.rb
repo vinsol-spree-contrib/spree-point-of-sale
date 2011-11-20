@@ -50,7 +50,8 @@ class Admin::PosController < Admin::BaseController
       order = Order.find order_id
       order.line_items.clear
     else
-      order = Order.new
+      order = Order.new 
+      order.user = current_user
       order.email = current_user.email
       order.save!
       if id_or_name = Spree::Config[:pos_shipping]
