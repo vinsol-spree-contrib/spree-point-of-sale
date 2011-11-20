@@ -146,6 +146,7 @@ class Admin::PosController < Admin::BaseController
     params[:search] ||= {}
     params[:search][:meta_sort] ||= "product_name.asc"
     params[:search][:deleted_at_is_null] = "1"
+    params[:search][:product_deleted_at_is_null] = "1"
     @search = Variant.metasearch(params[:search])
 
     @variants = @search.relation.page(params[:page]).per(20)
