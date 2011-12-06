@@ -65,7 +65,7 @@ function poptastic(url)
       <%= link_to( "#{item.variant.name} #{item.variant.options_text}" , edit_admin_product_url(item.variant.product)) %></td>
       <td> <%= form_tag do %>
             <%= hidden_field_tag(:quantity_id, item.id) %>
-            <%= select_tag("quantity" , options_for_select( (1..10).to_a , item.quantity), :onchange => 'this.form.submit()')%> 
+            <%= select_tag("quantity" , options_for_select( (1..20).to_a , item.quantity), :onchange => 'this.form.submit()')%> 
         <%end%></td>
       <td class="price"><%= form_tag do %> 
                   <%= hidden_field_tag(:price, item.id)   %>
