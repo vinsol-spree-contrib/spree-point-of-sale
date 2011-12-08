@@ -1,11 +1,53 @@
 class Admin::PosController < Admin::BaseController
 
   def new
-    session[:items] = {}
-    session[:pos_order] = nil
+    init
     redirect_to :action => :index
   end
 
+  def export
+    unless session[:items]
+      index
+      return
+    end
+    opt = {}
+    session[:items].each do |key , item | 
+      id = item.variant.ean.blank? ? item.variant.sku : item.variant.ean
+      opt[id] = item.quantity
+      item.variant.on_hand -= item.quantity
+      item.variant.save
+    end
+    init  # reset this pos
+    opt[:host] = Spree::Config[:pos_export] 
+    opt[:controller] = "pos" 
+    opt[:action] = "import" 
+    redirect_to opt
+  end
+  
+  def import
+    init
+    added = 0
+    params.each do |id , quant |
+      next if id == "action" 
+      next if id == "controller" 
+      v = Variant.find_by_ean id
+      if v 
+        add_variant(v , quant )
+        added += 1
+      else
+        v = Variant.find_by_sku id
+        if v 
+          add_variant(v , quant )
+          added += 1
+        else
+          add_error "No product found id #{id}"
+        end
+      end
+    end
+    add_notice "Added #{added} products" if added
+    redirect_to :action => :index
+  end
+  
   def inventory
     as = params[:as]
     num = 0 
@@ -25,7 +67,7 @@ class Admin::PosController < Admin::BaseController
   
   def add
     if pid = params[:item]
-      add_product Variant.find pid
+      add_variant Variant.find pid
     end
     redirect_to :action => :index
   end
@@ -111,7 +153,7 @@ class Admin::PosController < Admin::BaseController
         prods = Variant.where(:ean => sku ).limit(2)
       end
       if prods.length == 1
-        add_product prods.first
+        add_variant prods.first
       else
         redirect_to :action => :find , "search[product_name_contains]" => sku
         return
@@ -133,12 +175,23 @@ class Admin::PosController < Admin::BaseController
     
   private
   
+  def add_notice no
+    flash[:notice] = "" unless flash[:notice]
+    flash[:notice] << no
+  end
+  def add_error no
+    flash[:error] = "" unless flash[:error]
+    flash[:error] << no
+  end
   
-  def add_product prod
-    var = prod.class == Product ? prod.master : prod 
+  def init
+    session[:items] = {}
+    session[:pos_order] = nil
+  end
+  def add_variant var , quant = 1
     session[:items] = {} unless session[:items]
     item = session[:items][ var.id.to_s ] || PosItem.new( var )
-    item.quantity = item.quantity + 1
+    item.quantity = item.quantity + quant.to_i
     session[:items][ var.id.to_s ] = item 
     #flash.notice = t('product_added')
   end
