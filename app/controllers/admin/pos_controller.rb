@@ -10,12 +10,21 @@ class Admin::PosController < Admin::BaseController
       index
       return
     end
+    missing = []
+    session[:items].each do |key , item | 
+      missing << item.variant.full_name if item.variant.ean.blank?
+    end
+    unless missing.empty?
+      flash[:error] = "All items must have ean set, missing: #{missing.join(' , ')}"
+      redirect_to :action => "index" 
+      return
+    end
     opt = {}
     session[:items].each do |key , item | 
-      id = item.variant.ean.blank? ? item.variant.sku : item.variant.ean
-      opt[id] = item.quantity
-      item.variant.on_hand -= item.quantity
-      item.variant.save
+      var = item.variant
+      opt[var.ean] = item.quantity
+      var.on_hand =  var.on_hand - item.quantity
+      var.save!
     end
     init  # reset this pos
     opt[:host] = Spree::Config[:pos_export] 
@@ -40,7 +49,7 @@ class Admin::PosController < Admin::BaseController
           add_variant(v , quant )
           added += 1
         else
-          add_error "No product found id #{id}"
+          add_error "No product found for EAN #{id}     "
         end
       end
     end
