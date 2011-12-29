@@ -1,13 +1,13 @@
 <% content_for :head do -%>
-<SCRIPT TYPE="text/javascript">
-<!--
-var newwindow;
-function poptastic(url)
-{ newwindow=window.open(url,'Print','width=400,left=300,top=50,resizable=no,scrollbars=yes,toolbar=yes,status=no');
-  if (window.focus) {newwindow.focus()}
-}
-//-->
-</SCRIPT>
+  <SCRIPT TYPE="text/javascript">
+  <!--
+  var newwindow;
+  function poptastic(url)
+  { newwindow=window.open(url,'Print','width=400,left=300,top=50,resizable=no,scrollbars=yes,toolbar=yes,status=no');
+    if (window.focus) {newwindow.focus()}
+  }
+  //-->
+  </SCRIPT>
 <% end %>
 <% content_for :sidebar do %>
   <div class="search">
@@ -27,28 +27,31 @@ function poptastic(url)
   <script type="text/javascript" language="JavaScript">
     document.getElementById('sku').focus();
   </script>
+  <% @pix = 30 %>
   <div class="right">
-     Discount<br/>  <% [5,10,15,20,25].each do |i| %> 
-      <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i  %> 
-      <%end%> 
-      <%= link_to image_tag("admin/pos/delete_discount.png") , "/admin/pos/index?discount=0" %>
+     Discount 
+     <%= form_tag do %>
+     <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,70] ), :onchange => 'this.form.submit()')%> 
+     <%end%>
   </div><br/><br/><br/>
   <a href="javascript:poptastic('/admin/pos/print');" alt="Print"/>
-        <%= image_tag "admin/pos/print.png" %>  </a>
-  <a href="javascript:if (newwindow) newwindow.close()"><%= image_tag "admin/pos/close_print.png" , :alt => "Close Print" %> </a>  
+      <%= image_tag "admin/pos/print.png" %>
+  </a>
+  <a href="javascript:if (newwindow) newwindow.close()">
+    <%= image_tag "admin/pos/close_print.png" , :alt => "Close Print" %> 
+  </a>  
   <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
-    <%= image_tag "admin/pos/customer.png" , :alt => "New Customer" %> </a>  <br/>
-    
-    <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>
-
-    <a href="/admin/pos/export" target="_blank">
-      <%=  image_tag("admin/pos/export.jpg" )   if Spree::Config[:pos_export]%> 
-    </a>  
-    <a href="/admin/pos/inventory">      
-      <%= image_tag "admin/pos/inventory_plus.png" , :alt => "Add Inventory" , :width => 80 , :height => 80 %>  <br/>
-    </a>  
-    <a href="/admin/pos/inventory?as=true">
-      <%= image_tag "admin/pos/inventory.png" , :alt => "As Inventory" , :width => 80 , :height => 80 %>  <br/>
+    <%= image_tag "admin/pos/customer.png" , :alt => "New Customer" %> 
+  </a>  <br/>
+  <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>
+  <a href="/admin/pos/export" target="_blank">
+    <%=  image_tag("admin/pos/export.jpg" )   if Spree::Config[:pos_export]%> 
+  </a>  
+  <a href="/admin/pos/inventory">      
+    <%= image_tag "admin/pos/inventory_plus.png" , :alt => "Add Inventory" , :width => 80 , :height => 80 %>  <br/>
+  </a>  
+  <a href="/admin/pos/inventory?as=true">
+    <%= image_tag "admin/pos/inventory.png" , :alt => "As Inventory" , :width => 80 , :height => 80 %>  <br/>
   </a>  
 <%end%>
 <%= render 'shared/error_messages', :target => @pos %>
@@ -60,32 +63,42 @@ function poptastic(url)
     <th><%= t('remove') + "/"+ t('add') %></th>
     <th><%= t('discount') %></th>
   </tr>
-
   <% items.each_value do | item | %>
-    <tr>
-      <td width="300">
-        <%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %>
-      <%= link_to( "#{item.variant.name} #{item.variant.options_text}" , edit_admin_product_url(item.variant.product)) %></td>
-      <td> <%= form_tag do %>
-            <%= hidden_field_tag(:quantity_id, item.id) %>
-            <%= select_tag("quantity" , options_for_select( (1..20).to_a , item.quantity), :onchange => 'this.form.submit()')%> 
-        <%end%></td>
-      <td class="price"><%= form_tag do %> 
-                  <%= hidden_field_tag(:price, item.id)   %>
-                  <input type="submit" style="display:none"/>
-                  <%= text_field_tag "price#{item.id}" , item.price , 
-                  :onclick => "this.form.price#{item.id}.select()" , 
-                                      :onfocus => "this.form.m#{id}.select()"  , :size => 8  %>
-                    <% end %></td>
-      <td> <%= link_to image_tag("admin/pos/delete.png") , "/admin/pos/remove/#{item.id}"  %> 
-        <%= link_to image_tag("admin/pos/plus.png") , "/admin/pos/add/#{item.id}"  %> </td>
-      <td><big>  <% [5,10,15,20,25].each do |i| %>&nbsp;
-        <%= link_to image_tag("admin/pos/#{i}.png") , :discount => i , :item => item.id %>
-        <%end%></big> 
-        &nbsp;&nbsp;<%= link_to image_tag("admin/pos/delete_discount.png") , "/admin/pos/index?discount=0&item=#{item.id}" %>   
-      </td>
-    </tr>
-  <% end %>
+  <tr>
+    <td width="300">
+      <%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %>
+      <%= link_to( "#{item.variant.name} #{item.variant.options_text}" , edit_admin_product_url(item.variant.product)) %>
+    </td>
+    <td> 
+      <%= form_tag do %>
+      <%= hidden_field_tag(:quantity_id, item.id) %>
+      <%= select_tag("quantity" , options_for_select( (1..20).to_a , item.quantity), :onchange => 'this.form.submit()')%> 
+      <%end%>
+    </td>
+    <td class="price">
+      <big>
+        <%= form_tag do %> 
+        <%= hidden_field_tag(:price, item.id)   %>
+        <input type="submit" style="display:none"/>
+        <%= text_field_tag "price#{item.id}" , item.price , 
+        :onclick => "this.form.price#{item.id}.select()" , 
+        :onfocus => "this.form.m#{item.id}.select()"  , :size => 8  %>
+        <% end %>
+      </big>
+    </td>
+    <td> 
+      <%= link_to image_tag("admin/pos/delete.png", :width =>@pix , :height =>@pix) , "/admin/pos/remove/#{item.id}"  %> 
+      <%= link_to image_tag("admin/pos/plus.png", :width =>@pix , :height =>@pix) , "/admin/pos/add/#{item.id}"  %> </td>
+    <td>
+      <big>  
+        <%= form_tag do %>
+        <%= hidden_field_tag(:item, item.id) %>
+        <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,70] , item.price), :onchange => 'this.form.submit()')%> 
+        <%end%>
+      </big> 
+    </td>
+  </tr>
+<% end %>
 
   <tr class="total">
     <td colspan="3"><b><%= t('order_total') %>:</b></td>
