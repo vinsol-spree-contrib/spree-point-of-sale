@@ -1,4 +1,4 @@
-Rails.application.routes.draw do
+Spree::Core::Engine.routes.prepend do
   namespace :admin do
     match "pos/new" => "pos#new"
     match "pos/export" => "pos#export" 
@@ -9,7 +9,7 @@ Rails.application.routes.draw do
     match "pos/index" => "pos#index"
     match "pos/print" => "pos#print"
     match "pos/inventory" => "pos#inventory"
-    match "pos" => "pos#index"
+    get "pos" , :to => "pos#index"
   end
 #  match '/admin' => 'admin/pos#index', :as => :admin
 end

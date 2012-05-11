@@ -10,7 +10,7 @@ class PosItem
   end
   
   def variant
-     Variant.find @id
+     Spree::Variant.find @id
   end
 
   def price= p
@@ -26,7 +26,7 @@ class PosItem
     end
   end
   def reset_price
-    self.price = variant.tax_price
+    self.price = variant.price
   end
   
   def no_tax_price

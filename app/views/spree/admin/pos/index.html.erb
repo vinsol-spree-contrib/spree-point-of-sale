@@ -50,7 +50,8 @@
   </a>  <br/>
   <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>
   <a href="/admin/pos/export" target="_blank">
-    <%=  image_tag("admin/pos/export.jpg" )   if Spree::Config[:pos_export]%> 
+    <%=  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export]
+    %> 
   </a>  
   <a href="/admin/pos/inventory">      
     <%= image_tag "admin/pos/inventory_plus.png" , :alt => "Add Inventory" , :width => 80 , :height => 80 %>  <br/>
@@ -59,7 +60,7 @@
     <%= image_tag "admin/pos/inventory.png" , :alt => "As Inventory" , :width => 80 , :height => 80 %>  <br/>
   </a>  
 <%end%>
-<%= render 'shared/error_messages', :target => @pos %>
+<%= render 'spree/shared/error_messages', :target => @pos %>
 <table class="index">
   <tr>
     <th><%= t('item_description') %></th>

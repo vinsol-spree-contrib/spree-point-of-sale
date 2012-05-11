@@ -1,4 +1,4 @@
-class Admin::PosController < Admin::BaseController
+class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def new
     init
@@ -27,7 +27,7 @@ class Admin::PosController < Admin::BaseController
       var.save!
     end
     init  # reset this pos
-    opt[:host] = Spree::Config[:pos_export] 
+    opt[:host] = "" #Spree::Config[:pos_export] 
     opt[:controller] = "pos" 
     opt[:action] = "import" 
     redirect_to opt
@@ -39,12 +39,12 @@ class Admin::PosController < Admin::BaseController
     params.each do |id , quant |
       next if id == "action" 
       next if id == "controller" 
-      v = Variant.find_by_ean id
+      v = Spree::Variant.find_by_ean id
       if v 
         add_variant(v , quant )
         added += 1
       else
-        v = Variant.find_by_sku id
+        v = Spree::Variant.find_by_sku id
         if v 
           add_variant(v , quant )
           added += 1
@@ -76,7 +76,7 @@ class Admin::PosController < Admin::BaseController
   
   def add
     if pid = params[:item]
-      add_variant Variant.find pid
+      add_variant Spree::Variant.find pid
     end
     redirect_to :action => :index
   end
@@ -98,23 +98,23 @@ class Admin::PosController < Admin::BaseController
   def print
     order_id = session[:pos_order]
     if order_id
-      order = Order.find order_id
+      order = Spree::Order.find order_id
       order.line_items.clear
     else
-      order = Order.new 
+      order = Spree::Order.new 
       order.user = current_user
       order.email = current_user.email
       order.save!
       if id_or_name = Spree::Config[:pos_shipping]
-        method = ShippingMethod.find_by_name id_or_name
-        method = ShippingMethod.find_by_id(id_or_name) unless method
+        method = Spree::ShippingMethod.find_by_name id_or_name
+        method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
       end
-      order.shipping_method = method || ShippingMethod.first
+      order.shipping_method = method || Spree::ShippingMethod.first
       order.create_shipment!
     end
     session[:items].each_value do |item |
       puts "Variant #{item.variant.name} #{item.id}"
-      new_item = LineItem.new(:quantity => item.quantity  )
+      new_item = Spree::LineItem.new(:quantity => item.quantity  )
       new_item.variant_id = item.id
       puts "PRICE #{item.no_tax_price} #{item.no_tax_price.class}"
       new_item.price = item.no_tax_price
@@ -123,7 +123,7 @@ class Admin::PosController < Admin::BaseController
     if order_id
       order.payment.delete
     end
-    payment = Payment.new( :payment_method => PaymentMethod.find_by_type( "PaymentMethod::Check") , 
+    payment = Spree::Payment.new( :payment_method => Spree::PaymentMethod.find_by_type( "PaymentMethod::Check") , 
               :amount => order.total , :order_id => order.id )
     payment.save!
     payment.payment_source.capture(payment)
@@ -157,9 +157,9 @@ class Admin::PosController < Admin::BaseController
       end
     end
     if sku = params[:sku]
-      prods = Variant.where(:sku => sku ).limit(2)
-      if prods.length == 0 and Variant.instance_methods.include? "ean"
-        prods = Variant.where(:ean => sku ).limit(2)
+      prods = Spree::Variant.where(:sku => sku ).limit(2)
+      if prods.length == 0 and Spree::Variant.instance_methods.include? "ean"
+        prods = Spree::Variant.where(:ean => sku ).limit(2)
       end
       if prods.length == 1
         add_variant prods.first
@@ -210,7 +210,7 @@ class Admin::PosController < Admin::BaseController
     params[:search][:meta_sort] ||= "product_name.asc"
     params[:search][:deleted_at_is_null] = "1"
     params[:search][:product_deleted_at_is_null] = "1"
-    @search = Variant.metasearch(params[:search])
+    @search = Spree::Variant.metasearch(params[:search])
 
     @variants = @search.relation.page(params[:page]).per(20)
   end
