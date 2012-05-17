@@ -39,7 +39,17 @@ module SpreePos
       else
         puts "POS: EAN support disabled, run migration to activate"
       end
+      Spree::Variant.class_eval do
 
+        def tax_price
+          (self.price * (1 + self.product.effective_tax_rate)).round(2, BigDecimal::ROUND_HALF_UP)
+        end
+      end
+      Spree::Product.class_eval do
+
+        delegate_belongs_to :master, :ean
+
+      end
     end
 
     config.to_prepare &method(:activate).to_proc

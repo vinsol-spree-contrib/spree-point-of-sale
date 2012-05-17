@@ -1,3 +1,5 @@
 fi:
   pos: POS
-  
+  product_added: Tuote lisätty
+  product_removed: Product poistettu
+    

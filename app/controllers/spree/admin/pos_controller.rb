@@ -1,13 +1,20 @@
 class Spree::Admin::PosController < Spree::Admin::BaseController
-
+  before_filter :get_order , :except => :new
+  
+  def get_order
+    order_number = params[:number]
+    @order = Spree::Order.find_by_number(order_number)
+    raise "No order found for -#{order_number}-" unless @order
+  end
+  
   def new
     init
-    redirect_to :action => :index
+    redirect_to :action => :show , :number => @order.number
   end
 
   def export
     unless session[:items]
-      index
+      show
       return
     end
     missing = []
@@ -16,7 +23,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     end
     unless missing.empty?
       flash[:error] = "All items must have ean set, missing: #{missing.join(' , ')}"
-      redirect_to :action => "index" 
+      redirect_to :action => :show 
       return
     end
     opt = {}
@@ -54,7 +61,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       end
     end
     add_notice "Added #{added} products" if added
-    redirect_to :action => :index
+    redirect_to :action => :show
   end
   
   def inventory
@@ -77,84 +84,69 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def add
     if pid = params[:item]
       add_variant Spree::Variant.find pid
+      flash.notice = t('product_added')
     end
-    redirect_to :action => :index
+    redirect_to :action => :show 
   end
 
   def remove
     if pid = params[:item]
-      if( item = session[:items][pid] )
-        if item.quantity > 1 
-          item.quantity = item.quantity - 1
-        else
-          session[:items].delete( pid )
-        end
-        flash.notice = t('product_removed') 
+      variant = Spree::Variant.find(pid)
+      line_item = @order.line_items.find { |line_item| line_item.variant_id == variant.id }
+      line_item.quantity -= 1
+      if line_item.quantity == 0
+        @order.line_items.delete line_item
+      else
+        line_item.save
       end
+      flash.notice = t('product_removed') 
     end
-    redirect_to :action => :index
+    redirect_to :action => :show 
   end
 
   def print
-    order_id = session[:pos_order]
-    if order_id
-      order = Spree::Order.find order_id
-      order.line_items.clear
-    else
-      order = Spree::Order.new 
-      order.user = current_user
-      order.email = current_user.email
-      order.save!
-      if id_or_name = Spree::Config[:pos_shipping]
-        method = Spree::ShippingMethod.find_by_name id_or_name
-        method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
-      end
-      order.shipping_method = method || Spree::ShippingMethod.first
-      order.create_shipment!
+    unless @order.payment_ids.empty?
+      @order.payments.first.delete
     end
-    session[:items].each_value do |item |
-      puts "Variant #{item.variant.name} #{item.id}"
-      new_item = Spree::LineItem.new(:quantity => item.quantity  )
-      new_item.variant_id = item.id
-      puts "PRICE #{item.no_tax_price} #{item.no_tax_price.class}"
-      new_item.price = item.no_tax_price
-      order.line_items << new_item
-    end
-    if order_id
-      order.payment.delete
-    end
-    payment = Spree::Payment.new( :payment_method => Spree::PaymentMethod.find_by_type( "PaymentMethod::Check") , 
-              :amount => order.total , :order_id => order.id )
+    payment = Spree::Payment.new( :payment_method => Spree::PaymentMethod.find_by_type( "Spree::PaymentMethod::Check") , 
+              :amount => @order.total , :order_id => @order.id )
     payment.save!
     payment.payment_source.capture(payment)
-    order.state = "complete"
-    order.completed_at = Time.now
-    order.finalize!
-    order.save!
-    session[:pos_order] = order.id
-    redirect_to "/admin/invoice/#{order.number}/receipt"
+    @order.state = "complete"
+    @order.completed_at = Time.now
+    @order.finalize!
+    @order.save!
+    redirect_to "/admin/invoice/#{@order.number}/receipt"
   end
   
   def index
+    redirect_to :action => :new 
+  end
+  
+  def show
     if (pid = params[:price]) && request.post?
       item =  session[:items][pid] 
       puts "#{session[:items].first[0].class} + item #{item.class}"
       item.price = params["price#{pid}"].to_f
     end
-    if (pid = params[:quantity_id]) && request.post?
-      item =  session[:items][pid] 
-      puts "#{session[:items].first[0].class} + item #{item.class}"
+    if params[:quantity_id] && request.post?
+      iid = params[:quantity_id].to_i
+      item = @order.line_items.find { |line_item| line_item.id == iid }
+      #TODO error handling
       item.quantity = params[:quantity].to_i
+      item.save
+      @order.reload # must be something cached in there, because it doesnt work without. shame.
     end
     if discount = params[:discount]
-      if params[:item]
-        item = session[:items][params[:item]]
-        item.discount( discount )
+      if i_id = params[:item]
+        item = @order.line_items.find { |line_item| line_item.id.to_s == i_id }
+        item_discount( item , discount )
       else
-        session[:items].each_value do |item|
-          item.discount( discount )
+        @order.line_items.each do |item|
+          item_discount( item , discount )
         end
       end
+      @order.reload # must be something cached in there, because it doesnt work without. shame.
     end
     if sku = params[:sku]
       prods = Spree::Variant.where(:sku => sku ).limit(2)
@@ -168,7 +160,11 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
         return
       end
     end
-    render :index
+  end
+  
+  def item_discount item , discount
+    item.price = item.variant.price * ( 1.0 - discount.to_f/100.0 )
+    item.save!
   end
   
   def find
@@ -179,7 +175,6 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       search["variants_including_master_sku_contains"] = nil
       init_search
     end
-    render :find
   end
     
   private
@@ -194,15 +189,21 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
   
   def init
-    session[:items] = {}
-    session[:pos_order] = nil
+    @order = Spree::Order.new 
+    @order.user = current_user
+    @order.email = current_user.email
+    @order.save!
+    if id_or_name = "1647757474" #Spree::Config[:pos_shipping]
+      method = Spree::ShippingMethod.find_by_name id_or_name
+      method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
+    end
+    @order.shipping_method = method || Spree::ShippingMethod.first
+    @order.create_shipment!
+    session[:pos_order] = @order.number
   end
   def add_variant var , quant = 1
-    session[:items] = {} unless session[:items]
-    item = session[:items][ var.id.to_s ] || PosItem.new( var )
-    item.quantity = item.quantity + quant.to_i
-    session[:items][ var.id.to_s ] = item 
-    #flash.notice = t('product_added')
+    init unless @order 
+    @order.add_variant(var , quant)
   end
   
   def init_search

@@ -13,7 +13,7 @@
   <div class="search">
       <legend><%= t('add_product') %>  </legend>
 
-      <%= form_tag "/admin/pos/index" , :id => "product_search" do  %>
+      <%= form_tag "/admin/pos/show" , :id => "product_search" do  %>
       <input type="hidden" value="1" name="index">
         <div class="box">
           <p>
@@ -39,7 +39,7 @@
 	</form>
 
   </div><br/><br/><br/>
-  <a href="javascript:poptastic('/admin/pos/print');" alt="Print"/>
+  <a href="javascript:poptastic('/admin/pos/print/<%=@order.number%>');" alt="Print"/>
       <%= image_tag "admin/pos/print.png" %>
   </a>
   <a href="javascript:if (newwindow) newwindow.close()">
@@ -69,7 +69,7 @@
     <th><%= t('remove') + "/"+ t('add') %></th>
     <th><%= t('discount') %></th>
   </tr>
-  <% items.each_value do | item | %>
+  <% @order.line_items.each do | item | %>
   <tr>
     <td width="300">
       <%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %>
@@ -93,8 +93,9 @@
       </big>
     </td>
     <td> 
-      <%= link_to image_tag("admin/pos/delete.png", :width =>@pix , :height =>@pix) , "/admin/pos/remove/#{item.id}"  %> 
-      <%= link_to image_tag("admin/pos/plus.png", :width =>@pix , :height =>@pix) , "/admin/pos/add/#{item.id}"  %> </td>
+      <%= link_to image_tag("admin/pos/delete.png", :width =>@pix , :height =>@pix) , "/admin/pos/remove/#{@order.number}/#{item.variant.id}"  %> 
+      <%= link_to image_tag("admin/pos/plus.png", :width =>@pix , :height =>@pix) , 
+      "/admin/pos/add/#{@order.number}/#{item.variant.id}"    %> </td>
     <td>
       <big>  
         <%= form_tag do %>
@@ -112,7 +113,7 @@
 
   <tr class="total">
     <td colspan="3"><b><%= t('order_total') %>:</b></td>
-    <td colspan="2" class="total"><span id="order_total"><%= number_to_currency item_total %></span></td>
+    <td colspan="2" class="total"><span id="order_total"><%= number_to_currency @order.total %></span></td>
   </tr>
 </table>
 <br/>
