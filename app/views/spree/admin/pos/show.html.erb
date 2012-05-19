@@ -13,7 +13,7 @@
   <div class="search">
       <legend><%= t('add_product') %>  </legend>
 
-      <%= form_tag "/admin/pos/show" , :id => "product_search" do  %>
+      <%= form_tag "/admin/pos/show/#{@order.number}" , :id => "product_search" do  %>
       <input type="hidden" value="1" name="index">
         <div class="box">
           <p>
@@ -42,10 +42,10 @@
   <a href="javascript:poptastic('/admin/pos/print/<%=@order.number%>');" alt="Print"/>
       <%= image_tag "admin/pos/print.png" %>
   </a>
-  <a href="javascript:if (newwindow) newwindow.close()">
-    <%= image_tag "admin/pos/close_print.png" , :alt => "Close Print" %> 
+  <a href="/admin/orders/<%=@order.number%>">
+    <%= image_tag "admin/pos/order.jpg" , :alt => "View order" %> 
   </a>  
-  <a href="/admin/pos/new" onclick="javascript:if (newwindow) newwindow.close()">
+  <a href="/admin/pos/new?force=true" onclick="javascript:if (newwindow) newwindow.close()">
     <%= image_tag "admin/pos/customer.png" , :alt => "New Customer" %> 
   </a>  <br/>
   <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>

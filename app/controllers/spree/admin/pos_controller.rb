@@ -6,9 +6,12 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order = Spree::Order.find_by_number(order_number)
     raise "No order found for -#{order_number}-" unless @order
   end
-  
+    
   def new
-    init
+    unless params[:force]
+      @order = Spree::Order.last # TODO , this could be per user
+    end
+    init unless @order
     redirect_to :action => :show , :number => @order.number
   end
 
