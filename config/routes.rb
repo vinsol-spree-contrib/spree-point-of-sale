@@ -10,7 +10,7 @@ Spree::Core::Engine.routes.prepend do
 #    match "pos/export" => "pos#export" 
 #    match "pos/import" => "pos#import" 
 #    match "pos/index" => "pos#index"
-#    match "pos/inventory" => "pos#inventory"
+    match "pos/inventory/:number" => "pos#inventory"
     get "pos" , :to => "pos#new"
   end
 #  match '/admin' => 'admin/pos#index', :as => :admin

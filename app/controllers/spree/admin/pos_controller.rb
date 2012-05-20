@@ -70,7 +70,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def inventory
     as = params[:as]
     num = 0 
-    session[:items].each_value do |item |
+    prods = @order.line_items.count
+    @order.line_items.each do |item |
       variant = item.variant
       num += item.quantity
       if as
@@ -78,10 +79,11 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       else
         variant.on_hand += item.quantity
       end
-      variant.save
+      variant.save!
     end
-    flash.notice = "Total of #{num} items added for #{session[:items].length} products "     
-    self.new
+    @order.line_items.clear
+    flash.notice = "Total of #{num} items #{as ? 'inventoried': 'added'} for #{prods} products "     
+    redirect_to :action => :show 
   end
   
   def add

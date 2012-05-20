@@ -50,13 +50,13 @@
   </a>  <br/>
   <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>
   <a href="/admin/pos/export" target="_blank">
-    <%=  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export]
+    <%  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export]
     %> 
   </a>  
-  <a href="/admin/pos/inventory">      
+  <a href="/admin/pos/inventory/<%=@order.number%>">      
     <%= image_tag "admin/pos/inventory_plus.png" , :alt => "Add Inventory" , :width => 80 , :height => 80 %>  <br/>
   </a>  
-  <a href="/admin/pos/inventory?as=true">
+  <a href="/admin/pos/inventory/<%=@order.number%>?as=true">
     <%= image_tag "admin/pos/inventory.png" , :alt => "As Inventory" , :width => 80 , :height => 80 %>  <br/>
   </a>  
 <%end%>
