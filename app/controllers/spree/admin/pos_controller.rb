@@ -198,10 +198,11 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.user = current_user
     @order.email = current_user.email
     @order.save!
-    if id_or_name = "1647757474" #Spree::Config[:pos_shipping]
+    id_or_name = "1647757474" #Spree::Config[:pos_shipping]
+    #  if id_or_name = "1647757474" #Spree::Config[:pos_shipping]
       method = Spree::ShippingMethod.find_by_name id_or_name
       method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
-    end
+    #end
     @order.shipping_method = method || Spree::ShippingMethod.first
     @order.create_shipment!
     session[:pos_order] = @order.number
