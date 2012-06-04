@@ -33,34 +33,34 @@
 <%= paginate @variants %>
 
 <% content_for :sidebar do %>
-  <%= form_for [:admin, :pos ,  @search] do |f| %>
+  <%= search_form_for [:admin, :pos ,  @search] do |f| %>
     <div class="box">
       <h3><%= t(:search) %></h3>
       <p>
-        <%= f.label :product_name_contains, t("name") %><br />
-        <%= f.text_field :product_name_contains, :size => 15 %>
+        <%= f.label :product_name_cont, t("name") %><br />
+        <%= f.text_field :product_name_cont, :size => 15 %>
       </p>
       <p>
-        <%= f.label :product_description_contains, t("description") %><br />
-        <%= f.text_field :product_description_contains, :size => 15 %>
+        <%= f.label :product_description_cont, t("description") %><br />
+        <%= f.text_field :product_description_cont, :size => 15 %>
       </p>
       <p>
-        <%= f.label :sku_contains, t("sku") %><br />
-        <%= f.text_field :sku_contains, :size => 15 %>
+        <%= f.label :sku_cont, t("sku") %><br />
+        <%= f.text_field :sku_cont, :size => 15 %>
       </p>
       <p>
         <%if Spree::Variant.instance_methods.include? "ean"%>
-        <%= f.label :ean_equals, t("ean") %><br />
-        <%= f.text_field :ean_equals, :size => 15 %>
+        <%= f.label :ean_eq, t("ean") %><br />
+        <%= f.text_field :ean_eq, :size => 15 %>
         <% end %>
       </p>
       <p>
-        <%= f.label :price_less_than, t("price_min") %><br />
-        <%= f.text_field :price_less_than, :size => 15 %>
+        <%= f.label :price_lt, t("price_min") %><br />
+        <%= f.text_field :price_lt, :size => 15 %>
       </p>
       <p>
-        <%= f.label :price_gte, t("price_max") %><br />
-        <%= f.text_field :price_gte, :size => 15 %>
+        <%= f.label :price_gteq, t("price_max") %><br />
+        <%= f.text_field :price_gteq, :size => 15 %>
       </p>
 
       <p class="form-buttons">

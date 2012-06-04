@@ -165,7 +165,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       if prods.length == 1
         add_variant prods.first
       else
-        redirect_to :action => :find , "search[product_name_contains]" => sku
+        redirect_to :action => :find , "q[product_name_cont]" => sku
         return
       end
     end
@@ -179,9 +179,9 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def find
     init_search
     if params[:index]
-      search = params[:search]
-      search["name_contains"] = search["variants_including_master_sku_contains"]
-      search["variants_including_master_sku_contains"] = nil
+      search = params[:q]
+      search["name_cont"] = search["variants_including_master_sku_cont"]
+      search["variants_including_master_sku_cont"] = nil
       init_search
     end
   end
@@ -199,6 +199,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   
   def init
     @order = Spree::Order.new 
+    puts "USER #{current_user}"
     @order.user = current_user
     @order.email = current_user.email
     @order.save!
@@ -217,13 +218,12 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
   
   def init_search
-    params[:search] ||= {}
-    params[:search][:meta_sort] ||= "product_name.asc"
-    params[:search][:deleted_at_is_null] = "1"
-    params[:search][:product_deleted_at_is_null] = "1"
-    @search = Spree::Variant.metasearch(params[:search])
-
-    @variants = @search.relation.page(params[:page]).per(20)
+    params[:q] ||= {}
+    params[:q][:meta_sort] ||= "product_name.asc"
+    params[:q][:deleted_at_is_null] = "1"
+    params[:q][:product_deleted_at_is_null] = "1"
+    @search = Spree::Variant.ransack(params[:q])
+    @variants = @search.result(:distinct => true).page(params[:page]).per(20)
   end
 end
 
