@@ -111,12 +111,16 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def print
     unless @order.payment_ids.empty?
-      @order.payments.first.delete
+      @order.payments.first.delete unless @order.payments.first.amount == @order.total
     end
-    payment = Spree::Payment.new( :payment_method => Spree::PaymentMethod.find_by_type( "Spree::PaymentMethod::Check") , 
-              :amount => @order.total , :order_id => @order.id )
-    payment.save!
-    payment.payment_source.capture(payment)
+    unless @order.payment_ids.empty?
+      payment = Spree::Payment.new
+      payment.payment_method = Spree::PaymentMethod.find_by_type( "Spree::PaymentMethod::Check") 
+      payment.amount = @order.total 
+      payment.order = @order 
+      payment.save!
+      payment.payment_source.capture(payment)
+    end
     @order.state = "complete"
     @order.completed_at = Time.now
     @order.finalize!
