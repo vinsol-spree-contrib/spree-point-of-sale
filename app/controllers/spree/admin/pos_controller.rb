@@ -123,6 +123,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     end
     @order.state = "complete"
     @order.completed_at = Time.now
+    @order.create_tax_charge!
     @order.finalize!
     @order.save!
     redirect_to "/admin/invoice/#{@order.number}/receipt"
