@@ -1,5 +1,7 @@
 fi:
   pos: POS
-  product_added: Tuote lisätty
-  product_removed: Product poistettu
+  product_added: "Tuote lisätty"
+  quantity_changed: "Määrä muutettu"
+  product_removed: "Tuote poistettu"
+  price_changed: "Hinta muutettu"
     

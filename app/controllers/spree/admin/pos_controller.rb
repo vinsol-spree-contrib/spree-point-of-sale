@@ -133,10 +133,13 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
   
   def show
-    if (pid = params[:price]) && request.post?
-      item =  session[:items][pid] 
-      puts "#{session[:items].first[0].class} + item #{item.class}"
+    if params[:price] && request.post?
+      pid = params[:price].to_i
+      item = @order.line_items.find { |line_item| line_item.id == pid }
       item.price = params["price#{pid}"].to_f
+      item.save
+      @order.reload # must be something cached in there, because it doesnt work without. shame.
+      flash.notice = I18n.t("price_changed")
     end
     if params[:quantity_id] && request.post?
       iid = params[:quantity_id].to_i
@@ -145,6 +148,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       item.quantity = params[:quantity].to_i
       item.save
       @order.reload # must be something cached in there, because it doesnt work without. shame.
+      flash.notice = I18n.t("quantity_changed")      
     end
     if discount = params[:discount]
       if i_id = params[:item]

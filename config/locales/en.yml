@@ -2,4 +2,6 @@ en:
   pos: POS
   product_added: Product added
   product_removed: Product removed
-  
+  quantity_changed: "Quantity changed"
+  price_change: Price changed
+    
