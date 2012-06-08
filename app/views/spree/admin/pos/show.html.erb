@@ -33,10 +33,6 @@
      <%= form_tag do %>
      <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,60,70] ), :onchange => 'this.form.submit()')%> 
      <%end%>
-	<form oninput="x.value=parseInt(a.value)">0 
-	<input type="range" name="a" value="0" min="0" max="70" value="0" step="5"/> 70
-	 = <span style="font-weight:bold; font-size:14px;"><output name="x" for="a"></output> %</span>
-	</form>
 
   </div><br/><br/><br/>
   <a href="javascript:poptastic('/admin/pos/print/<%=@order.number%>');" alt="Print"/>
@@ -103,10 +99,6 @@
         <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,60,70] , item.price), :onchange => 'this.form.submit()')%> 
         <%end%>
       </big> 
-	<form oninput="x.value=parseInt(a.value)">0 
-	<input type="range" name="a" value="0" min="0" max="70" value="0" step="5"/> 70
-	 = <span style="font-weight:bold; font-size:14px;"><output name="x" for="a"></output> %</span>
-	</form>
     </td>
   </tr>
 <% end %>
