@@ -1,10 +1,16 @@
 module SpreePos
+
   class Engine < Rails::Engine
     engine_name 'spree_pos'
 
     config.autoload_paths += %W(#{config.root}/lib)
 
+    initializer "spree.spree_pos.preferences", :after => "spree.environment" do |app|
+      SpreePos::Config = SpreePos::Configuration.new
+    end
+
     def self.activate
+
       Dir.glob(File.join(File.dirname(__FILE__), "../app/**/*decorator.rb")) do |c|
         Rails.env.production? ? require(c) : load(c)
       end

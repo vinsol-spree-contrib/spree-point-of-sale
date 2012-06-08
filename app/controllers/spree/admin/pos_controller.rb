@@ -11,7 +11,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     unless params[:force]
       @order = Spree::Order.last # TODO , this could be per user
     end
-    init unless @order
+    init if @order == nil or not @order.complete?
     redirect_to :action => :show , :number => @order.number
   end
 
@@ -113,13 +113,13 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     unless @order.payment_ids.empty?
       @order.payments.first.delete unless @order.payments.first.amount == @order.total
     end
-    unless @order.payment_ids.empty?
+    if @order.payment_ids.empty?
       payment = Spree::Payment.new
-      payment.payment_method = Spree::PaymentMethod.find_by_type( "Spree::PaymentMethod::Check") 
+      payment.payment_method = Spree::PaymentMethod.find_by_type_and_environment( "Spree::PaymentMethod::Check" , Rails.env)
       payment.amount = @order.total 
       payment.order = @order 
       payment.save!
-      payment.payment_source.capture(payment)
+      payment.capture!
     end
     @order.state = "complete"
     @order.completed_at = Time.now
@@ -199,15 +199,12 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   
   def init
     @order = Spree::Order.new 
-    puts "USER #{current_user}"
     @order.user = current_user
+    @order.bill_address = @order.user.bill_address
+    @order.ship_address = @order.user.ship_address
     @order.email = current_user.email
     @order.save!
-    id_or_name = "1647757474" #Spree::Config[:pos_shipping]
-    #  if id_or_name = "1647757474" #Spree::Config[:pos_shipping]
-      method = Spree::ShippingMethod.find_by_name id_or_name
-      method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
-    #end
+    method = Spree::ShippingMethod.find_by_name SpreePos::Config[:pos_shipping]
     @order.shipping_method = method || Spree::ShippingMethod.first
     @order.create_shipment!
     session[:pos_order] = @order.number
@@ -215,6 +212,16 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def add_variant var , quant = 1
     init unless @order 
     @order.add_variant(var , quant)
+  end
+
+  private
+  def find_shipping_method
+    method_name = Spree_Pos::Config[:pos_shipping]
+    #  if id_or_name = "1647757474" #Spree::Config[:pos_shipping]
+      method = Spree::ShippingMethod.find_by_name_and_environment method_name , Rails.env
+      method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
+    #end
+    @order.shipping_method = method || Spree::ShippingMethod.first
   end
   
   def init_search
