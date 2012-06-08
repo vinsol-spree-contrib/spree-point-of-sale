@@ -3,7 +3,7 @@ Spree::Core::Engine.routes.prepend do
 
     match "pos/new" => "pos#new"
     match "pos/show/:number" => "pos#show"
-    match "pos/find/search/:number" => "pos#find"
+    match "pos/find/:number" => "pos#find"
     match "pos/add/:number/:item" => "pos#add"
     match "pos/remove/:number/:item" => "pos#remove"
     match "pos/print/:number" => "pos#print"
