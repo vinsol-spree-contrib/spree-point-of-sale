@@ -68,6 +68,11 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
   
   def inventory
+    if @order.state == "complete"
+      flash[:error] = "Order was already completed (printed), please start with a new customer to add inventory"     
+      redirect_to :action => :show 
+      return
+    end
     as = params[:as]
     num = 0 
     prods = @order.line_items.count
