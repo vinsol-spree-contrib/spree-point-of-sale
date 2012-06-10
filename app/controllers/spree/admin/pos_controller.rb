@@ -131,7 +131,9 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.create_tax_charge!
     @order.finalize!
     @order.save!
-    redirect_to "/admin/invoice/#{@order.number}/receipt"
+    url = SpreePos::Config[:pos_printing]
+    url.sub!("number" , @order.number.to_s)
+    redirect_to url
   end
   
   def index
@@ -225,14 +227,6 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   private
-  def find_shipping_method
-    method_name = Spree_Pos::Config[:pos_shipping]
-    #  if id_or_name = "1647757474" #Spree::Config[:pos_shipping]
-      method = Spree::ShippingMethod.find_by_name_and_environment method_name , Rails.env
-      method = Spree::ShippingMethod.find_by_id(id_or_name) unless method
-    #end
-    @order.shipping_method = method || Spree::ShippingMethod.first
-  end
   
   def init_search
     params[:q] ||= {}
