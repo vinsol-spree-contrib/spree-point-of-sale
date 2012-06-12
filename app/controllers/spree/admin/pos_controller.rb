@@ -132,7 +132,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.finalize!
     @order.save!
     url = SpreePos::Config[:pos_printing]
-    url.sub!("number" , @order.number.to_s)
+    url = url.sub("number" , @order.number.to_s)
     redirect_to url
   end
   
