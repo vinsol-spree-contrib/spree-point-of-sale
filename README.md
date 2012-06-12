@@ -67,4 +67,4 @@ Add to your Gemfile with
 and run bundler. (read about the dependencies if you haven't yet)
 
 
-Copyright (c) 2011 [Torsten Rüger], released under the New BSD License
+Copyright (c) 2011 [Torsten Ruger], released under the New BSD License
