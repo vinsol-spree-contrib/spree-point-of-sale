@@ -27,19 +27,19 @@ module SpreePos
                            :disabled => false)
       if Spree::Variant.first and Spree::Variant.first.respond_to? :ean
         Deface::Override.new(:virtual_path => "spree/admin/products/_form",
-                             :name => "Add ean to product list",
-                             :replace => "p:contains('sku')",
-                             :text => "<p>
-                                    <%= f.label :sku, t(:sku) %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= f.label :ean, t(:ean) %><br>
-                                    <%= f.text_field :sku, :size => 16 %> <%= f.text_field :ean, :size => 16 %>
-                                    </p>",
+                             :name => "Add ean to product form",
+                             :insert_after => "code[erb-silent]:contains('has_variants')",
+                             :text => "<% unless @product.has_variants? %> <p>
+                                    <%= f.label :ean, t(:ean) %><br>
+                                    <%= f.text_field :ean, :size => 16 %>
+                                    </p> <%end%>",
                              :disabled => false)
         Deface::Override.new(:virtual_path => "spree/admin/variants/_form",
                              :name => "add_ean_to_variants_edit",
-                             :replace => "p:contains('sku')",
-                             :text => "<p data-hook='sku'>
-                                    <%= f.label :sku, t(:sku) %> <%= f.label :ean, t(:ean) %><br>
-                                    <%= f.text_field :sku, :size => 16 %> <%= f.text_field :ean, :size => 16 %>
+                             :insert_after => "[data-hook='sku']",
+                             :text => "<p data-hook='ean'>
+                                    <%= f.label :ean, t(:ean) %><br>
+                                    <%= f.text_field :ean, :size => 16 %>
                                     </p>",
                              :disabled => false)
       else
