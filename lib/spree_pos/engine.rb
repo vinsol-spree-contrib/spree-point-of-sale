@@ -20,11 +20,6 @@ module SpreePos
                            :text => " <%= tab( :pos , :url => admin_pos_path) %>",
                            :sequence => {:after => "promo_admin_tabs"},
                            :disabled => false)
-      Deface::Override.new(:virtual_path => "spree/admin/variants/index",
-                           :name => "fix_vat_price",
-                           :replace => "td:contains('price')",
-                           :text => "<td><%=  variant.price %></td>",
-                           :disabled => false)
       if Spree::Variant.first and Spree::Variant.first.respond_to? :ean
         Deface::Override.new(:virtual_path => "spree/admin/products/_form",
                              :name => "Add ean to product form",
