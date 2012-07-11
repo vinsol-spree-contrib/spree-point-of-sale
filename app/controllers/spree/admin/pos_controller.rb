@@ -155,6 +155,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       #TODO error handling
       item.quantity = params[:quantity].to_i
       item.save
+      #TODO Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
+      item.variant.product.save
       @order.reload # must be something cached in there, because it doesnt work without. shame.
       flash.notice = I18n.t("quantity_changed")      
     end
@@ -224,13 +226,15 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def add_variant var , quant = 1
     init unless @order 
     @order.add_variant(var , quant)
+    #TODO Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
+    var.product.save
   end
 
   private
   
   def init_search
     params[:q] ||= {}
-    params[:q][:meta_sort] ||= "product_name.asc"
+    params[:q][:meta_sort] ||= "product_name asc"
     params[:q][:deleted_at_is_null] = "1"
     params[:q][:product_deleted_at_is_null] = "1"
     @search = Spree::Variant.ransack(params[:q])
