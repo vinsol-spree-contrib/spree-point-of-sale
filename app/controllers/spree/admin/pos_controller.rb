@@ -235,8 +235,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def init_search
     params[:q] ||= {}
     params[:q][:meta_sort] ||= "product_name asc"
-    params[:q][:deleted_at_is_null] = "1"
-    params[:q][:product_deleted_at_is_null] = "1"
+    params[:q][:deleted_at_null] = "1"
+    params[:q][:product_deleted_at_null] = "1"
     @search = Spree::Variant.ransack(params[:q])
     @variants = @search.result(:distinct => true).page(params[:page]).per(20)
   end
