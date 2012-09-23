@@ -55,12 +55,12 @@
         <% end %>
       </p>
       <p>
-        <%= f.label :price_lt, t("price_min") %><br />
-        <%= f.text_field :price_lt, :size => 15 %>
+        <%= f.label :price_gteq, t("price_min") %><br />
+        <%= f.text_field :price_gteq, :size => 15 %>
       </p>
       <p>
-        <%= f.label :price_gteq, t("price_max") %><br />
-        <%= f.text_field :price_gteq, :size => 15 %>
+        <%= f.label :price_lteq, t("price_max") %><br />
+        <%= f.text_field :price_lteq, :size => 15 %>
       </p>
 
       <p class="form-buttons">
