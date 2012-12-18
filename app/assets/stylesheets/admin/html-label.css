@@ -1,0 +1,20 @@
+@page  { 
+	margin-left:1mm;
+	margin-right:1mm;
+	margin-top:1mm;
+	margin-bottom:1mm;
+	 }
+
+body {
+    font-family:"Helvetica";
+	color:#000000;
+	width:200px;
+}
+
+.label-name {
+	font-size:13px;
+}
+
+.label-price {
+	font-size:13px;
+}

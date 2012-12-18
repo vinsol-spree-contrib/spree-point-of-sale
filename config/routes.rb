@@ -1,5 +1,7 @@
 Spree::Core::Engine.routes.prepend do
   namespace :admin do
+    match "barcode/print/:id" => "barcode#print"
+    match "barcode/code/:id" => "barcode#code"
 
     match "pos/new" => "pos#new"
     match "pos/show/:number" => "pos#show"

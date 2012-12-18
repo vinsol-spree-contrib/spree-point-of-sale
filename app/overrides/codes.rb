@@ -1,0 +1,10 @@
+Deface::Override.new(:virtual_path => 'spree/admin/variants/_form',
+                     :name => "Add product label button",
+                     :insert_bottom => ".right",
+                     :partial => "admin/products/barcode_variant_link",
+                     :disabled => false)
+Deface::Override.new(:virtual_path => 'spree/admin/products/_form',
+                     :name => "Add product label button",
+                     :insert_bottom => ".right",
+                     :partial => "admin/products/barcode_product_link",
+                     :disabled => false)
