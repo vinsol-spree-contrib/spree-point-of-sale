@@ -29,7 +29,7 @@
   </script>
   <% @pix = 30 %>
   <div class="right">
-     Discount 
+     <%= t(:discount )%>
      <%= form_tag do %>
      <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,60,70] ), :onchange => 'this.form.submit()')%> 
      <%end%>

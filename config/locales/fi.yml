@@ -4,4 +4,6 @@ fi:
   quantity_changed: "Määrä muutettu"
   product_removed: "Tuote poistettu"
   price_changed: "Hinta muutettu"
-    
+  discount: Alennus
+  quantity: Määrä
+  
