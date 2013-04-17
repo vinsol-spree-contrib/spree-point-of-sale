@@ -1,3 +1,8 @@
+Update
+========
+
+Notice of demolition: this rep WILL be removed. Go fork, even register your fork on spreecommerce, but don't sent pushes.
+
 SpreePos
 ===============
 
