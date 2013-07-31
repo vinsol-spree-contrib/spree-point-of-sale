@@ -1,8 +1,3 @@
-Update
-========
-
-Notice of demolition: this rep WILL be removed. Go fork, even register your fork on spreecommerce, but don't sent pushes.
-
 SpreePos
 ===============
 
@@ -76,7 +71,7 @@ Installation
 
 Add to your Gemfile with 
 
-  gem "spree_pos", :git => "git://github.com/dancinglightning/spree-pos.git"
+  gem "spree_pos", :git => "git://github.com/vinsol/spree-point-of-sale.git"
 
 and run bundler. (read about the dependencies if you haven't yet)
 
