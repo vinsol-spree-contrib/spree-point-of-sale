@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<%= stylesheet_link_tag "admin/html-label" %>
+<%= stylesheet_link_tag "admin/html-label" , :media => "print" %>
+<title>Barcode</title>
+</head>
+
+<body>
+  <div>
+    <table valign="middle" width="200px" height="75">
+      <tr class="label-name">
+        <td colspan="2"><%=@product.name%> </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="<%=product_barcode_url%>" height="40" width="132"/>
+        </td>
+        <td class="label-price" width="60px"align="right">
+          <%=@product.price%> €
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
+

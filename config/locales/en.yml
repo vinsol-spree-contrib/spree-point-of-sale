@@ -1,0 +1,13 @@
+en:
+  spree:
+    pos: POS
+    product_added: Product added
+    product_removed: Product removed
+    quantity_changed: "Quantity changed"
+    price_change: Price changed
+    order_total: 'Order Total'
+    item_description: 'Item Description'
+    select: Select
+    master_price: Master Price
+
+    

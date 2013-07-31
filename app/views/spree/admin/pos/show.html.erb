@@ -1,0 +1,127 @@
+<% content_for :head do -%>
+  <SCRIPT TYPE="text/javascript">
+  <!--
+  var newwindow;
+  function poptastic(url)
+  { newwindow=window.open(url,'Print','width=400,left=300,top=50,resizable=no,scrollbars=yes,toolbar=yes,status=no');
+    if (window.focus) {newwindow.focus()}
+  }
+  //-->
+  </SCRIPT>
+<% end %>
+<% content_for :sidebar do %>
+
+  <% if user_stock_location(spree_current_user).count > 1 %>   
+    <div class="stock_locations">
+      <fieldset>
+        <legend>Change Stock Location</legend>
+        <%= form_tag "/admin/pos/update_stock_location/#{@order.number}", :remote => true, :method => :put, :class => 'modify_stock_location_form' do %>
+          <% user_stock_location(spree_current_user).all.each do |stock_location| %>
+            <%= radio_button_tag :stock_location_id, stock_location.id, (stock_location.id == @order.shipment.stock_location.id), :id => "stock_location_#{ stock_location.id }", :class => 'stock_location_checkbox' %><%= stock_location.name %><br />
+          <% end %>
+          <br />
+          <%= submit_tag 'Update' %>
+        <% end %>
+      </fieldset>
+    </div>
+  <% end %>
+
+  <div class="search">
+      <legend><%= Spree.t('add_product') %>  </legend>
+
+      <%= form_tag "/admin/pos/show/#{@order.number}" , :id => "product_search" do  %>
+      <input type="hidden" value="1" name="index">
+        <div class="box">
+          <p>
+            <%= label_tag :sku, Spree.t("sku") %><br />
+            <%= text_field_tag :sku, "" , :size => 15 %>
+            <%= button Spree.t("search") %>
+          </p>
+        </div>
+      <% end %>
+  </div>        
+  <script type="text/javascript" language="JavaScript">
+    document.getElementById('sku').focus();
+  </script>
+  <% @pix = 30 %>
+  <div class="right">
+     <%= Spree.t(:discount )%>
+     <%= form_tag do %>
+     <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,60,70] ), :onchange => 'this.form.submit()')%> 
+     <%end%>
+
+  </div><br/><br/><br/>
+  <a href="javascript:poptastic('/admin/pos/print/<%=@order.number%>');" alt="Print"/>
+      <%= image_tag "admin/pos/print.png" %>
+  </a>
+  <a href="/admin/orders/<%=@order.number%>">
+    <%= image_tag "admin/pos/order.jpg" , :alt => "View order" %> 
+  </a>  
+  <a href="/admin/pos/new?force=true" onclick="javascript:if (newwindow) newwindow.close()">
+    <%= image_tag "admin/pos/customer.png" , :alt => "New Customer" %> 
+  </a>  <br/>
+  <%= image_tag "admin/pos/barcode.jpg" , :alt => "Trenner" , :width => 280 , :height => 15 %>  <br/>
+  <a href="/admin/pos/export" target="_blank">
+    <%  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export]
+    %> 
+  </a>  
+  <a href="/admin/pos/inventory/<%=@order.number%>">      
+    <%= image_tag "admin/pos/inventory_plus.png" , :alt => "Add Inventory" , :width => 80 , :height => 80 %>  <br/>
+  </a>  
+  <a href="/admin/pos/inventory/<%=@order.number%>?as=true">
+    <%= image_tag "admin/pos/inventory.png" , :alt => "As Inventory" , :width => 80 , :height => 80 %>  <br/>
+  </a>  
+<%end%>
+<%= render 'spree/shared/error_messages', :target => @pos %>
+<table class="index">
+  <tr>
+    <th><%= Spree.t('item_description') %></th>
+    <th><%= Spree.t('quantity') %></th>
+    <th class="price"><%= Spree.t('price') %></th>
+    <th><%= Spree.t('remove') + "/"+ Spree.t('add') %></th>
+    <th><%= Spree.t('discount') %></th>
+  </tr>
+  <% @order.line_items.each do | item | %>
+  <tr>
+    <td width="300">
+      <%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %>
+      <%= link_to( "#{item.variant.name} #{item.variant.options_text}" , edit_admin_product_url(item.variant.product)) %>
+    </td>
+    <td> 
+      <%= form_tag do %>
+      <%= hidden_field_tag(:quantity_id, item.id) %>
+      <%= select_tag("quantity" , options_for_select( (1..20).to_a , item.quantity), :onchange => 'this.form.submit()')%> 
+      <%end%>
+    </td>
+    <td class="price">
+      <big>
+        <%= form_tag do %> 
+        <%= hidden_field_tag(:price, item.id)   %>
+        <input type="submit" style="display:none"/>
+        <%= text_field_tag "price#{item.id}" , item.price , 
+        :onclick => "this.form.price#{item.id}.select()" , 
+        :onfocus => "this.form.m#{item.id}.select()"  , :size => 8  %>
+        <% end %>
+      </big>
+    </td>
+    <td> 
+      <%= link_to image_tag("admin/pos/delete.png", :width =>@pix , :height =>@pix) , "/admin/pos/remove/#{@order.number}/#{item.variant.id}"  %> 
+      <%= link_to image_tag("admin/pos/plus.png", :width =>@pix , :height =>@pix) , 
+      "/admin/pos/add/#{@order.number}/#{item.variant.id}"    %> </td>
+    <td>
+      <big>  
+        <%= form_tag do %>
+        <%= hidden_field_tag(:item, item.id) %>
+        <%= select_tag("discount" , options_for_select( ["",0,5,10,15,20,25,30,35,40,50,60,70] , item.price), :onchange => 'this.form.submit()')%> 
+        <%end%>
+      </big> 
+    </td>
+  </tr>
+<% end %>
+
+  <tr class="total">
+    <td colspan="3"><b><%= Spree.t('order_total') %>:</b></td>
+    <td colspan="2" class="total"><span id="order_total"><%= number_to_currency @order.total %></span></td>
+  </tr>
+</table>
+<br/>

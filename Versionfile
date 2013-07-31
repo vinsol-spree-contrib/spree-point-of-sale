@@ -1,0 +1,11 @@
+# This file is used to designate compatibilty with different versions of Spree
+# Please see http://spreecommerce.com/documentation/extensions.html#versionfile for details
+
+"0.70.x" => { :ref => "793ca3ad2822877babf60c5e3d3bd7b3f39be3db"}
+# note: the 1.0 version was in never in production use as I had server crashes with 1.0 and upgraded immediately to 1.1
+"1.0.x" => { :ref => "7075b1b483faa183679761f060072515e45dcaf7"}
+
+"1.1.x" => { :branch => "master" }
+
+
+

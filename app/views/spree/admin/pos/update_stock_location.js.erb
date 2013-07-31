@@ -1,0 +1,5 @@
+<% if @order.shipment.errors.full_messages.present? %>
+  alert('Stock Location is not updated.');
+<% else %>
+  alert('Stock Location is updated.');
+<% end %>
