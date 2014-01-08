@@ -1,8 +1,14 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'admin/pos_admin' %>
+<% end if only_pos_admin_access? %>
+
+<% unless @variants.blank? %>
 <table>
   <tr>
     <td>
     <table class="index" id='listing_products'>
       <tr>
+          <th>SKU</th>
           <th><%= Spree.t("image") %></th>
           <th><%= sort_link @search,:product_name, Spree.t("name"), {}, {:title => 'admin_products_listing_name_title'} %></th>
           <th><%= sort_link @search,:price, Spree.t("master_price") %></th>
@@ -11,6 +17,7 @@
       <% @variants.each do |variant| %>
       <% next if variant.is_master and variant.product.has_variants?%>
         <tr <%= 'style="color:red;"' if variant.deleted? %> id="<%= dom_id variant %>">
+          <td><%= variant.sku %></td>
           <td><% if variant.images.first  %>
               <%= image_tag variant.images.first.attachment.url(:mini) %>
               <%elsif variant.product.images.first %>
@@ -31,8 +38,13 @@
   </tr>
 </table>
 <%= paginate @variants %>
-
+<% else %>
+No Result Found
+<% end %>
 <% content_for :sidebar do %>
+  <div>
+    <%= button_to "Back To Order", admin_pos_show_order_path(:number => @order.number) %>
+  </div>
   <%= search_form_for   @search , :url => "/admin/pos/find/#{@order.number}/" do |f| %>
     <div class="box">
       <h3><%= Spree.t(:search) %></h3>

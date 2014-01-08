@@ -15,4 +15,8 @@ module Admin::PosHelper
   def items
     session[:items] || {}
   end
+
+  def only_pos_admin_access?
+    spree_current_user && spree_current_user.has_spree_role?('pos_admin') && !spree_current_user.has_spree_role?('admin')
+  end
 end

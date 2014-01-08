@@ -19,20 +19,23 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<spree_core>, [">= 1.2"])
+      s.add_runtime_dependency(%q<spree_core>, ["~> 2.0.3"])
+      s.add_runtime_dependency(%q<spree_backend>, ["~> 2.0.3"])
       s.add_runtime_dependency(%q<barby>, [">= 0"])
       s.add_runtime_dependency(%q<prawn>, [">= 0"])
       s.add_runtime_dependency(%q<rqrcode>, [">= 0"])
       s.add_runtime_dependency(%q<chunky_png>, [">= 0"])
     else
-      s.add_dependency(%q<spree_core>, [">= 1.2"])
+      s.add_runtime_dependency(%q<spree_core>, ["~> 2.0.3"])
+      s.add_runtime_dependency(%q<spree_backend>, ["~> 2.0.3"])
       s.add_dependency(%q<barby>, [">= 0"])
       s.add_dependency(%q<prawn>, [">= 0"])
       s.add_dependency(%q<rqrcode>, [">= 0"])
       s.add_dependency(%q<chunky_png>, [">= 0"])
     end
   else
-    s.add_dependency(%q<spree_core>, [">= 1.2"])
+    s.add_runtime_dependency(%q<spree_core>, ["~> 2.0.0"])
+    s.add_runtime_dependency(%q<spree_backend>, ["~> 2.0.0"])
     s.add_dependency(%q<barby>, [">= 0"])
     s.add_dependency(%q<prawn>, [">= 0"])
     s.add_dependency(%q<rqrcode>, [">= 0"])

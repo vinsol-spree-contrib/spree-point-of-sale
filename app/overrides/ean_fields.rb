@@ -1,4 +1,4 @@
-if Spree::Variant.first and Spree::Variant.first.respond_to? :ean
+if Spree::Variant.table_exists? and Spree::Variant.first and Spree::Variant.first.respond_to? :ean
   Spree::Product.class_eval do
     attr_accessible :ean
   end
