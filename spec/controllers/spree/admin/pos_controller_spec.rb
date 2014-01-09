@@ -62,7 +62,27 @@ describe Spree::Admin::PosController do
         end
       end
 
-      context 'not paid' do
+      context 'not paid but not pos' do
+        before { order.stub(:is_pos?).and_return(false) }
+
+        describe 'loads and checks order' do
+          it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
+          it { order.should_receive(:paid?).and_return(true) }
+          it { order.should_receive(:is_pos?).and_return(false) }
+          it { controller.should_not_receive(:show) }
+
+          after { send_request({ :number => order.number }) }
+        end
+
+        describe 'response' do
+          before { send_request({ :number => order.number }) }
+
+          it { flash[:error].should eq('This is not a pos order') }
+          it { response.should render_template('show') }
+        end
+      end
+
+      context 'not paid and pos order' do
         before { order.stub(:paid?).and_return(false) }
 
         describe 'loads and checks order' do
@@ -147,6 +167,16 @@ describe Spree::Admin::PosController do
           Spree::Variant.should_receive(:where).with(:id => variant.id.to_s).and_return([variant])
           send_request(:item => variant.id, :number => order.number)
         end
+
+        it 'proceeds further to add' do
+          controller.should_receive(:add_variant).with(variant).and_return(line_item)
+          send_request(:item => variant.id, :number => order.number)
+        end
+
+        it 'sets no flash error' do
+          send_request(:item => variant.id, :number => order.number)
+          flash[:error].should be_nil
+        end
       end
 
       context 'no variant with the id passed' do
@@ -213,6 +243,11 @@ describe Spree::Admin::PosController do
           order.should_not_receive(:complete_via_pos)
           send_request(:number => order.number, :payment_method_id => @payment_method.id, :card_name => 'Credit Card')
         end
+
+        it 'redirects' do
+          send_request(:number => order.number, :payment_method_id => @payment_method.id, :card_name => 'Credit Card')
+          response.should redirect_to(:action => :show, :number => order.number)
+        end          
       end
     end
   end
@@ -254,6 +289,11 @@ describe Spree::Admin::PosController do
           controller.should_not_receive(:init_pos)
           send_request
         end
+
+        it 'redirects to action show' do
+          send_request
+          response.should redirect_to(:action => :show, :number => order.number)
+        end
       end
 
       context 'no pending order' do
@@ -267,6 +307,11 @@ describe Spree::Admin::PosController do
           it { @new_order.should_receive(:bill_address=).with(address).and_return(address) }
           it { @new_order.should_receive(:ship_address=).with(address).and_return(address) }
           after { send_request }
+        end
+
+        it 'redirects to action show' do
+          send_request
+          response.should redirect_to(:action => :show, :number => @new_order.number)
         end
       end
     end
@@ -446,6 +491,11 @@ describe Spree::Admin::PosController do
       end
 
       context 'added successfully' do
+        it 'redirects to action show' do
+          send_request(:number => order.number, :item => variant.id)
+          response.should redirect_to(:action => :show, :number => order.number)
+        end
+
         it 'sets the flash message' do
           send_request(:number => order.number, :item => variant.id)
           flash[:notice].should eq('Product added')
@@ -454,6 +504,12 @@ describe Spree::Admin::PosController do
 
       context 'not added successfully' do
         before {line_item.stub(:errors).and_return(:base => "error")}
+        
+        it 'redirects to action show' do
+          send_request(:number => order.number, :item => variant.id)
+          response.should redirect_to(:action => :show, :number => order.number)
+        end
+
         it 'sets the flash message' do
           send_request(:number => order.number, :item => variant.id)
           flash[:notice].should eq('Adding more than available')
@@ -498,6 +554,11 @@ describe Spree::Admin::PosController do
           flash[:notice].should eq('Quantity Updated')
         end
       end
+
+      it 'redirects to action show' do
+        send_request(:number => order.number, :item => variant.id)
+        response.should redirect_to(:action => :show, :number => order.number)
+      end
     end
 
     describe 'clean_order' do
@@ -513,6 +574,11 @@ describe Spree::Admin::PosController do
       it 'calls clean! method on order' do
         order.should_receive(:clean!).and_return(true)
         send_request({:number => order.number})
+      end
+
+      it 'redirects to action show' do
+        send_request(:number => order.number)
+        response.should redirect_to(:action => :show, :number => order.number)
       end
 
       it 'sets flash message' do
@@ -537,6 +603,11 @@ describe Spree::Admin::PosController do
       end
 
       context 'if user added successfully' do
+        it 'redirects to action show' do
+          send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+          response.should redirect_to(:action => :show, :number => order.number)
+        end
+
         it 'sets the flash message' do
           send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
           flash[:notice].should eq('Successfully Associated User')
@@ -549,6 +620,12 @@ describe Spree::Admin::PosController do
           @error_object.stub_chain(:full_messages, :to_sentence).and_return('error_message')
           user.stub(:errors).and_return(@error_object)
         end
+        
+        it 'redirects to action show' do
+          send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+          response.should redirect_to(:action => :show, :number => order.number)
+        end
+
         it 'sets the flash message' do
           send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
           flash[:error].should eq('Could not add the user:error_message')
@@ -576,7 +653,7 @@ describe Spree::Admin::PosController do
 
       context 'payment successfully updated' do
         it 'prints the order' do
-          order.should_receive(:complete_via_pos).and_return(true)
+          controller.should_receive(:print).and_return{ controller.render :nothing => true }
           send_request(:number => order.number, :payment_method_id => @payment_method.id, :card_name => 'Credit Card')
         end
       end
@@ -586,6 +663,11 @@ describe Spree::Admin::PosController do
           @error_object = Object.new
           @error_object.stub_chain(:full_messages, :to_sentence).and_return('error_message')
           payment.stub(:errors).and_return(@error_object)
+        end
+
+        it 'redirects to action show' do
+          send_request(:number => order.number, :payment_method_id => @payment_method.id, :card_name => 'Credit Card')
+          response.should redirect_to(:action => :show, :number => order.number)
         end
 
         it 'sets the error message' do
@@ -624,17 +706,24 @@ describe Spree::Admin::PosController do
         @shipment.stub(:save).and_return(true)
       end
 
-      it { @stock_location.stub(:address).and_return(address) }
-      it { order.stub(:ship_address=).with(address).and_return(address) }
-      it { order.stub(:bill_address=).with(address).and_return(address) }
-      it { @shipment.stub(:stock_location=).with(@stock_location).and_return(@stock_location) }
-      it { @shipment.stub(:stock_location).and_return(@stock_location) }
-      it { order.stub(:shipment).and_return(@shipment) }
-      it { order.stub(:save).and_return(true) }
-      it { @shipment.stub(:save).and_return(true) }
-      it { order.should_receive(:save).and_return(true) }
+      describe 'updates order addresses and update shipment' do
+        it { @stock_location.stub(:address).and_return(address) }
+        it { order.stub(:ship_address=).with(address).and_return(address) }
+        it { order.stub(:bill_address=).with(address).and_return(address) }
+        it { @shipment.stub(:stock_location=).with(@stock_location).and_return(@stock_location) }
+        it { @shipment.stub(:stock_location).and_return(@stock_location) }
+        it { order.stub(:shipment).and_return(@shipment) }
+        it { order.stub(:save).and_return(true) }
+        it { @shipment.stub(:save).and_return(true) }
+        it { order.should_receive(:save).and_return(true) }
 
-      after { send_request(:number => order.number, :stock_location_id => @stock_location.id)}
+        after { send_request(:number => order.number, :stock_location_id => @stock_location.id) }
+      end
+
+      it 'redirects to action show' do
+        send_request(:number => order.number, :stock_location_id => @stock_location.id)
+        response.should redirect_to(:action => :show, :number => order.number)
+      end
     end
   end
 end

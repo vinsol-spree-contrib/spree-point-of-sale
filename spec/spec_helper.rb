@@ -7,6 +7,8 @@ require 'rspec/rails'
 require 'rubygems'
 require 'bundler/setup'
 require 'spree_pos'
+require 'database_cleaner'
+
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 # Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
@@ -42,4 +44,24 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
+
+  config.before :suite do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before type: :request do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before :each do
+    # Before each spec check if it is a Javascript test and switch between using database transactions or not where necessary.
+    DatabaseCleaner.strategy = example.metadata[:js] ? :truncation : :transaction
+    DatabaseCleaner.start
+  end
+
+  # After each spec clean the database.
+  config.after :each do
+    DatabaseCleaner.clean
+  end
 end

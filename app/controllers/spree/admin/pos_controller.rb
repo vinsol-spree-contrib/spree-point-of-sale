@@ -31,19 +31,19 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def add
     @line_item = add_variant(@variant) if @variant.present?
     flash.notice = @line_item.errors[:base].present? ? 'Adding more than available' : Spree.t('product_added') if @line_item
-    redirect_to :action => :show 
+    redirect_to :action => :show, :number => @order.number 
   end
 
   def remove
     line_item = @order.contents.remove(@variant, 1, @order.shipment)
     flash.notice = line_item.quantity != 0 ? 'Quantity Updated' : Spree.t('product_removed') 
-    redirect_to :action => :show 
+    redirect_to :action => :show, :number => @order.number
   end
 
   def clean_order
     @order.clean!
     flash[:notice] = "Removed all items"
-    redirect_to :action => :show , :number => @order.number
+    redirect_to :action => :show, :number => @order.number
   end
 
   def associate_user
@@ -54,7 +54,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       flash[:notice] = 'Successfully Associated User'
     end
 
-    redirect_to :action => :show , :number => @order.number
+    redirect_to :action => :show, :number => @order.number
   end
 
   def update_payment
@@ -64,7 +64,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       print
     else
       add_error @payment.errors.full_messages.to_sentence
-      redirect_to :action => :show , :number => @order.number
+      redirect_to :action => :show, :number => @order.number
     end
   end
 
@@ -73,7 +73,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.bill_address = @order.ship_address = @order.shipment.stock_location.address
     @order.save
     @order.shipment.save
-    redirect_to :action => :show , :number => @order.number
+    redirect_to :action => :show, :number => @order.number
   end
   
   private 
@@ -107,7 +107,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def ensure_payment_method
     if Spree::PaymentMethod.where(:id => params[:payment_method_id]).blank?
       flash[:error] = 'Please select a payment method'
-      redirect_to :action => :show , :number => @order.number
+      redirect_to :action => :show, :number => @order.number
     end
   end
 
