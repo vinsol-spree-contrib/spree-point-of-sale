@@ -15,11 +15,10 @@ Spree::Core::Engine.routes.prepend do
     match "pos/update_payment/:number" => "pos#update_payment"
 #    match "pos/export" => "pos#export" 
 #    match "pos/import" => "pos#import" 
-#    match "pos/index" => "pos#index"
+    match "pos/index" => "pos#new"
     # match "pos/inventory/:number" => "pos#inventory"
     match "pos/update_stock_location/:number" => "pos#update_stock_location", :via => :put
     get "pos" , :to => "pos#new"
   end
 #  match '/admin' => 'admin/pos#index', :as => :admin
 end
-

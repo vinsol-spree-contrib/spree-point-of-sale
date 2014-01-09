@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 describe Spree::Order do
+  let(:user) { mock_model(Spree::User, :email => 'test-user@pos.com') }
   [:state, :is_pos, :completed_at, :payment_state].each do |attribute|
     it { should allow_mass_assignment_of attribute }
   end
 
   before do
-    @order = Spree::Order.create!
+    @order = Spree::Order.create! 
+    @order.stub(:total).and_return 100
     @variant = Spree::Variant.new
     @shipment = @order.shipments.new
     @line_item = @order.line_items.new(:quantity => 1)
@@ -87,6 +89,65 @@ describe Spree::Order do
 
         after { @order.assign_shipment_for_pos }
       end      
+    end
+  end
+
+  describe '#save_payment_for_pos' do
+    before do
+      @payments.stub(:delete_all).and_return(true)
+      @payments.stub(:create).with(:amount => 100, :payment_method_id => 1, :card_name => 'MasterCard').and_return(@payment)
+    end
+    it { @payments.should_receive(:delete_all).and_return(true) }
+    it { @payments.should_receive(:create).with(:amount => 100, :payment_method_id => 1, :card_name => 'MasterCard').and_return(@payment) }
+    after { @order.save_payment_for_pos(1, 'MasterCard') }
+  end
+
+  describe '#associate_user_for_pos' do
+    context 'user with email exists' do
+      before do
+        Spree::User.stub(:where).with(:email => user.email).and_return([user])
+        @order.stub(:associate_user!).with(user).and_return(true)
+      end
+
+      context 'when user is valid' do
+        before { user.stub(:valid?).and_return(true) }
+
+        it { @order.should_receive(:associate_user!).with(user).and_return(true) }
+        after { @order.associate_user_for_pos(user.email, 'new', 'user', '07123456789') }
+      end
+
+      context 'when user is not valid' do
+        before { user.stub(:valid?).and_return(false) }
+        
+        it { @order.should_not_receive(:associate_user!).with(user) }
+        after { @order.associate_user_for_pos(user.email, 'new', 'user', '07123456789') }
+      end
+      
+      it { @order.associate_user_for_pos(user.email, 'new', 'user', '07123456789').should eq(user) }
+    end
+
+    context 'user with email does not exist' do
+      before do
+        @new_user = mock_model(Spree::User)
+        Spree::User.stub(:create_with_random_password).with('new-user@pos.com', 'new', 'user', '07123456789').and_return(@new_user)
+        @order.stub(:associate_user!).with(@new_user).and_return(true)
+      end
+
+      context 'when new user is valid' do
+        before { @new_user.stub(:valid?).and_return(true) }
+
+        it { @order.should_receive(:associate_user!).with(@new_user).and_return(true) }
+        after { @order.associate_user_for_pos('new-user@pos.com', 'new', 'user', '07123456789') }
+      end
+
+      context 'when new user is not valid' do
+        before { @new_user.stub(:valid?).and_return(false) }
+        
+        it { @order.should_not_receive(:associate_user!).with(@new_user) }
+        after { @order.associate_user_for_pos('new-user@pos.com', 'new', 'user', '07123456789') }
+      end
+
+      it { @order.associate_user_for_pos('new-user@pos.com', 'new', 'user', '07123456789').should eq(@new_user) }
     end
   end
 end

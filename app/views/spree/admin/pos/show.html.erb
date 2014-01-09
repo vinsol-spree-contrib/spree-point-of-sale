@@ -33,48 +33,56 @@
 <%= stylesheet_link_tag 'admin/pos_admin' if only_pos_admin_access? %>
 <% end %>
 <% content_for :sidebar do %>
-<% if user_stock_location(spree_current_user).count > 1 %>
+  <% if user_stock_locations(spree_current_user).count > 1 %>
 
-<div class="stock_locations">
-  <fieldset>
-    <legend>Change Stock Location</legend>
-    <%= form_tag "/admin/pos/update_stock_location/#{@order.number}", :remote => true, :method => :put, :class => 'modify_stock_location_form' do %>
-    <% user_stock_location(spree_current_user).all.each do |stock_location| %>
-    <%= radio_button_tag :stock_location_id, stock_location.id, (stock_location.id == @order.shipment.stock_location.id), :id => "stock_location_#{ stock_location.id }", :class => 'stock_location_checkbox' %><%= stock_location.name %><br />
-    <% end %>
-    <br />
-    <%= submit_tag 'Update' %>
-    <% end %>
-  </fieldset>
-</div>
-<% end %>
-<div class="search">
-  <legend>Search & Add Product </legend>
-  <%= form_tag "/admin/pos/show/#{@order.number}" , :id => "product_search" do  %>
-  <input type="hidden" value="1" name="index">
-  <div class="box">
-    <p> <%= text_field_tag :sku, "" , :size => 15 %> <%= button Spree.t("search") %> </p>
+  <div class="stock_locations">
+    <fieldset>
+      <legend>Change Stock Location</legend>
+      <%= form_tag "/admin/pos/update_stock_location/#{@order.number}", :remote => true, :method => :put, :class => 'modify_stock_location_form' do %>
+      <% user_stock_locations(spree_current_user).all.each do |stock_location| %>
+      <%= radio_button_tag :stock_location_id, stock_location.id, (stock_location.id == @order.shipment.stock_location.id), :id => "stock_location_#{ stock_location.id }", :class => 'stock_location_checkbox' %><%= stock_location.name %><br />
+      <% end %>
+      <br />
+      <%= submit_tag 'Update' %>
+      <% end %>
+    </fieldset>
   </div>
   <% end %>
-</div>
-<script type="text/javascript" language="JavaScript">
+  <div class="search">
+    <legend>Search & Add Product </legend>
+    <%= form_tag "/admin/pos/show/#{@order.number}" , :id => "product_search" do  %>
+      <input type="hidden" value="1" name="index">
+      <div class="box">
+        <p> <%= text_field_tag :sku, "" , :size => 15 %> <%= button Spree.t("search") %> </p>
+      </div>
+    <% end %>
+  </div>
+
+  <script type="text/javascript" language="JavaScript">
     document.getElementById('sku').focus();
-    $("#update_payment input[value='" + <%= @payment_method_id %> + "']").attr('checked', 'checked');
   </script>
-<% @pix = 30 %>
-<br/>
-<br/>
-<br/>
-<br/>
-<a href="/admin/pos/export" target="_blank">
-<%  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export]
-    %>
-</a>
+  <% @pix = 30 %>
+  <br/><br/><br/><br/>
+  <a href="/admin/pos/export" target="_blank">
+  <%  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export] %>
+  </a>
 <%end%>
+
 <%= render 'spree/shared/error_messages', :target => @pos %>
-<h5>Order No: <%= @order.number %> <a href="/admin/pos/new" onClick="javascript:if (newwindow) newwindow.close()" class="create_order button"> Create New Order</a></h5>
+
+<h5>Order No: <%= @order.number %>
+  <a href="/admin/pos/new" onClick="javascript:if (newwindow) newwindow.close()" class="create_order button"> 
+    Create New Order
+  </a>
+</h5>
+
 <h5>Order For: <%= @order.email %></h5>
-<div><a href="javascript:void(0);" id="associate_user_toggle" class="button">Change User</a></div>
+
+<div>
+  <a href="javascript:void(0);" id="associate_user_toggle" class="button">
+    Change User
+  </a>
+</div>
 <%= form_tag "/admin/pos/associate_user/#{@order.number}", :id => "associate_user" do %>
 <div class="tabbing">
   <ul>
@@ -163,9 +171,12 @@
     <td colspan="6" class="total"><span id="order_total"><%= @order.display_total.to_html %></span></td>
   </tr>
 </table>
-<div class="belowtable row"> <%= button_to "Remove All Items", admin_pos_clean_order_path(:number => @order.number) , data: { confirm: "Are you sure?" } %> </div>
-<div class="row"> <%= form_tag "/admin/pos/update_payment/#{@order.number}", :id => "update_payment" do %>
 
+<div class="belowtable row"> <%= button_to "Remove All Items", admin_pos_clean_order_path(:number => @order.number) , data: { confirm: "Are you sure?" } %> </div>
+
+<div class="row"> 
+
+  <%= form_tag "/admin/pos/update_payment/#{@order.number}", :id => "update_payment" do %>
     <div class="four rows alpha">
       <div class="field">
         <p>
@@ -175,10 +186,8 @@
         </p>
       </div>
       
-        <div id="card_name" class="rows"> <%= select_tag(:card_name, options_for_select(Spree::Order::CARD_TYPE, "#{@order.payments.first.try(:card_name)}"), include_blank: true, :id => 'card_name_options') %> <%= button_tag "Confirm And Print", :class => "fr", :data => { :confirm =>"Are you sure you want to confirm this order?"}  %></div>
-      
+      <div id="card_name" class="rows"> <%= select_tag(:card_name, options_for_select(Spree::Order::CARD_TYPE, "#{@order.payments.first.try(:card_name)}"), include_blank: true, :id => 'card_name_options') %> <%= button_tag "Confirm And Print", :class => "fr", :data => { :confirm =>"Are you sure you want to confirm this order?"}  %>
+      </div>    
     </div>
-
- 
   <% end %>
 </div>

@@ -38,7 +38,7 @@ class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   end
 
   def load
-    @variant = Spree::Variant.find params[:id]
+    @variant = Spree::Variant.where(:id => params[:id]).first
   end
 
   def load_product_and_variants
