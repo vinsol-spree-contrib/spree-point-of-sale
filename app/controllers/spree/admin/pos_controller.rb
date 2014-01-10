@@ -47,7 +47,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def associate_user
-    @user = @order.associate_user_for_pos(params[:email] || params[:new_email])
+    @user = @order.associate_user_for_pos(params[:email].present? ? params[:email] : params[:new_email])
     if @user.errors.present?
       add_error "Could not add the user:#{@user.errors.full_messages.to_sentence}"
     else
@@ -153,7 +153,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def update_line_item_quantity
-    item = @order.line_items.where(:id => params[:item]).first
+    item = @order.line_items.where(:id => params[:line_item_id]).first
     #TODO error handling
     item.quantity = params[:quantity].to_i
     item.save
