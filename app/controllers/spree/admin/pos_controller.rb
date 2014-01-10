@@ -51,6 +51,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     if @user.errors.present?
       add_error "Could not add the user:#{@user.errors.full_messages.to_sentence}"
     else
+      @order.save!
       flash[:notice] = 'Successfully Associated User'
     end
 

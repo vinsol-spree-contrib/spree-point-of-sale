@@ -35,7 +35,7 @@ Spree::Order.class_eval do
 
   def associate_user_for_pos(new_user_email)
     associate_with_user = Spree::User.where(:email => new_user_email).first || Spree::User.create_with_random_password(new_user_email)
-    associate_user!(associate_with_user) if associate_with_user.valid?
+    self.email = new_user_email if associate_with_user.valid?
     associate_with_user
   end
 end
