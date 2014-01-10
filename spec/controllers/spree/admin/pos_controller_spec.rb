@@ -29,7 +29,9 @@ describe Spree::Admin::PosController do
 
   context 'before filters' do
     before do
-      Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+      @orders = [order]
+      Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+      @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
     end
     
     describe 'check_valid_order' do
@@ -38,7 +40,11 @@ describe Spree::Admin::PosController do
       end
 
       context 'order does not exist' do
-        before { Spree::Order.stub(:where).with(:number => order.number).and_return([]) }
+        before do 
+          @orders = []
+          Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+          @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)    
+        end
 
         it { expect { send_request(:number => order.number) }.to raise_error "No order found for -#{order.number}-"  }
       end
@@ -47,7 +53,7 @@ describe Spree::Admin::PosController do
         before { order.stub(:paid?).and_return(true) }
 
         describe 'loads and checks order' do
-          it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
+          # it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
           it { order.should_receive(:paid?).and_return(true) }
           it { controller.should_not_receive(:show) }
 
@@ -66,7 +72,7 @@ describe Spree::Admin::PosController do
         before { order.stub(:is_pos?).and_return(false) }
 
         describe 'loads and checks order' do
-          it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
+          # it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
           it { order.should_receive(:paid?).and_return(true) }
           it { order.should_receive(:is_pos?).and_return(false) }
           it { controller.should_not_receive(:show) }
@@ -86,7 +92,7 @@ describe Spree::Admin::PosController do
         before { order.stub(:paid?).and_return(false) }
 
         describe 'loads and checks order' do
-          it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
+          # it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
           it { order.should_receive(:paid?).and_return(false) }
           it { controller.request.should_receive(:post?).and_return(false) }
 
@@ -318,7 +324,9 @@ describe Spree::Admin::PosController do
 
     describe 'show' do
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
       end
 
       def send_request(params = {})
@@ -330,6 +338,7 @@ describe Spree::Admin::PosController do
           before do
             @line_items = [line_item]
             order.stub(:line_items).and_return(@line_items)
+            @line_items.stub(:where).and_return(@line_items)
             line_item.stub(:quantity=).with(2).and_return(true)
             line_item.stub(:save).and_return(true)
             line_item.stub(:variant).and_return(variant)
@@ -339,9 +348,6 @@ describe Spree::Admin::PosController do
             it { order.should_receive(:line_items).and_return(@line_items) }
             it { line_item.should_receive(:quantity=).with(2).and_return(true) }
             it { line_item.should_receive(:save).and_return(true) }
-            it { line_item.should_receive(:variant).and_return(variant) }
-            it { variant.should_receive(:product).and_return(product) }
-            it { product.should_receive(:save).and_return(true) }
             it { order.should_receive(:reload).and_return(true) }
             after { send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2) }
           end
@@ -386,6 +392,7 @@ describe Spree::Admin::PosController do
         before do
           @line_items = [line_item]
           order.stub(:line_items).and_return(@line_items)
+          @line_items.stub(:where).and_return(@line_items)
           line_item.stub(:variant).and_return(variant)
           line_item.stub(:save).and_return(true)
           line_item.stub(:price=).with(18.0).and_return(true)
@@ -419,13 +426,16 @@ describe Spree::Admin::PosController do
       end
 
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @stock_location = mock_model(Spree::StockLocation)
         controller.stub(:user_stock_locations).with(user).and_return([@stock_location])
         @variants = [variant]
         @variants.stub(:result).with(:distinct => true).and_return(@variants)
         @variants.stub(:page).with('1').and_return(@variants)
         @variants.stub(:per).and_return(@variants)
+        Spree::Variant.stub(:includes).with([:product]).and_return(Spree::Variant)
         Spree::Variant.stub(:available_at_stock_location).with(@stock_location.id).and_return(Spree::Variant)
         Spree::Variant.stub(:ransack).with({"product_name_cont"=>"test-product", "meta_sort"=>"product_name asc", "deleted_at_null"=>"1", "product_deleted_at_null"=>"1", "published_at_not_null"=>"1"}).and_return(@variants)
       end
@@ -444,7 +454,9 @@ describe Spree::Admin::PosController do
       end
 
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @payment_method = mock_model(Spree::PaymentMethod)
         Spree::PaymentMethod.stub(:where).with(:id => @payment_method.id.to_s).and_return([@payment_method])
         order.stub(:save_payment_for_pos).with(@payment_method.id.to_s, 'Credit Card').and_return(payment)
@@ -464,7 +476,9 @@ describe Spree::Admin::PosController do
 
     describe 'add' do
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         Spree::Variant.stub(:where).with(:id => variant.id.to_s).and_return([variant])
         @order_contents = double(Spree::OrderContents)
         @shipment = mock_model(Spree::Shipment)
@@ -519,7 +533,9 @@ describe Spree::Admin::PosController do
 
     describe 'remove' do
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         Spree::Variant.stub(:where).with(:id => variant.id.to_s).and_return([variant])
         @order_contents = double(Spree::OrderContents)
         @shipment = mock_model(Spree::Shipment)
@@ -563,7 +579,9 @@ describe Spree::Admin::PosController do
 
     describe 'clean_order' do
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         order.stub(:clean!).and_return(true)
       end
 
@@ -589,7 +607,9 @@ describe Spree::Admin::PosController do
 
     describe 'associate_user' do
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         order.stub(:associate_user_for_pos).with('test-user@pos.com', 'test', 'user', '07123456789').and_return(user)
       end
 
@@ -639,7 +659,9 @@ describe Spree::Admin::PosController do
       end
 
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @payment_method = mock_model(Spree::PaymentMethod)
         Spree::PaymentMethod.stub(:where).with(:id => @payment_method.id.to_s).and_return([@payment_method])
         order.stub(:save_payment_for_pos).with(@payment_method.id.to_s, 'Credit Card').and_return(payment)
@@ -688,7 +710,9 @@ describe Spree::Admin::PosController do
       end
 
       before do
-        Spree::Order.stub(:where).with(:number => order.number).and_return([order])
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @stock_location = mock_model(Spree::StockLocation)
         @stock_location.stub(:address).and_return(address)
         @stock_locations = [@stock_location]

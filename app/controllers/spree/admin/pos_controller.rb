@@ -24,7 +24,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
     #using the scope available_at_stock_location which should be defined according to app or removed if not required
     stock_location = user_stock_locations(spree_current_user).first
-    @search = Spree::Variant.available_at_stock_location(stock_location.id).ransack(params[:q])
+    @search = Spree::Variant.includes([:product]).available_at_stock_location(stock_location.id).ransack(params[:q])
     @variants = @search.result(:distinct => true).page(params[:page]).per(20)
   end
 
@@ -83,7 +83,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def load_order
-    @order = Spree::Order.by_number(params[:number]).first
+    @order = Spree::Order.by_number(params[:number]).includes([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }] ).first
     raise "No order found for -#{params[:number]}-" unless @order
   end
   
@@ -153,21 +153,19 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def update_line_item_quantity
-    item = @order.line_items.find { |line_item| line_item.id == params[:line_item_id].to_i }
+    item = @order.line_items.where(:id => params[:item]).first
     #TODO error handling
     item.quantity = params[:quantity].to_i
     item.save
     #TODO Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
-    item.variant.product.save
     @order.reload # must be something cached in there, because it doesnt work without. shame.
     flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
   end
 
   def apply_discount
-    valid_discount_regex = /^\d*\.?\d+$/
-    if valid_discount_regex.match(params[:discount]) && params[:discount].to_f < 100
+    if VALID_DISCOUNT_REGEX.match(params[:discount]) && params[:discount].to_f < 100
       @discount = params[:discount].to_f
-      item = @order.line_items.find { |line_item| line_item.id.to_s == params[:item] }
+      item = @order.line_items.where(:id => params[:item]).first
       item.price = item.variant.price * ( 1.0 - @discount/100.0 )
       @order.reload # must be something cached in there, because it doesnt work without. shame.
       item.save
