@@ -3,7 +3,7 @@ Spree::Order.class_eval do
 
   scope :pos, where(:is_pos => true)
   scope :unpaid, where("payment_state != 'paid'")
-  scope :pending_pos_order, ->{ pos.unpaid }
+  scope :unpaid_pos_order, ->{ pos.unpaid }
 
   def clean!
     payments.delete_all

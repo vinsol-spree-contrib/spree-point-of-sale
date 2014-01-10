@@ -1,6 +1,6 @@
 Spree::User.class_eval do
-  def pending_pos_orders
-    orders.pending_pos_order
+  def unpaid_pos_orders
+    orders.unpaid_pos_order
   end
 
   def self.create_with_random_password(email)

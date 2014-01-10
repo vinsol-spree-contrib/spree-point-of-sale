@@ -1,12 +1,12 @@
 class Spree::Admin::PosController < Spree::Admin::BaseController
-  before_filter :check_valid_order, :except => [:new, :print]
+  before_filter :check_valid_order, :except => [:new]
   helper_method :user_stock_locations
   before_filter :load_variant, :only => [:add, :remove]
   before_filter :ensure_pos_shipping_method, :only => [:new]
   before_filter :ensure_payment_method, :only => [:update_payment]
 
   def new
-    @order = spree_current_user.pending_pos_orders.first
+    @order = spree_current_user.unpaid_pos_orders.first
     @order ? add_error("You have an upaid/empty order. Please either complete it or update items in the same order.") : init_pos
     redirect_to :action => :show , :number => @order.number
   end

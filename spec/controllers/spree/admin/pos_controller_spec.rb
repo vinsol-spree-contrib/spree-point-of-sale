@@ -17,7 +17,7 @@ describe Spree::Admin::PosController do
     controller.stub(:authorize!).and_return(true)
     user.stub(:generate_spree_api_key!).and_return(true)
     user.stub(:roles).and_return(roles)
-    user.stub(:pending_pos_orders).and_return([order])
+    user.stub(:unpaid_pos_orders).and_return([order])
     roles.stub(:includes).and_return(roles)
     role.stub(:ability).and_return(true)
     variant.stub(:product).and_return(product)
@@ -263,6 +263,8 @@ describe Spree::Admin::PosController do
       controller.stub(:ensure_pos_shipping_method).and_return(true)
       controller.stub(:ensure_payment_method).and_return(true)
       Spree::StockLocation.stub_chain(:active,:stores,:first,:address).and_return(address)
+      controller.instance_variable_set(:@order,order)
+      controller.stub(:check_valid_order).and_return(true)
     end
 
     describe 'new' do
@@ -280,8 +282,15 @@ describe Spree::Admin::PosController do
         get :new, params.merge!(:use_route => 'spree')
       end
 
+      context 'before filters' do
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        it { controller.should_not_receive(:check_valid_order) }
+        after { send_request }
+      end
+
       it 'checks for pending orders' do
-        user.should_receive(:pending_pos_orders).and_return([order])
+        user.should_receive(:unpaid_pos_orders).and_return([order])
         send_request
       end
 
@@ -303,7 +312,7 @@ describe Spree::Admin::PosController do
       end
 
       context 'no pending order' do
-        before { user.stub(:pending_pos_orders).and_return([]) }
+        before { user.stub(:unpaid_pos_orders).and_return([]) }
         
         context 'init_pos' do
           it { Spree::Order.should_receive(:new).with(:state => "complete", :is_pos => true, :completed_at => @current_time, :payment_state => 'balance_due').and_return(@new_order) }
@@ -345,6 +354,9 @@ describe Spree::Admin::PosController do
           end
 
           context 'update_line_item_quantity' do
+            it { controller.should_receive(:check_valid_order).and_return(true) }
+            it { controller.should_not_receive(:ensure_pos_shipping_method) }
+            it { controller.should_not_receive(:ensure_payment_method) }
             it { order.should_receive(:line_items).and_return(@line_items) }
             it { line_item.should_receive(:quantity=).with(2).and_return(true) }
             it { line_item.should_receive(:save).and_return(true) }
@@ -366,6 +378,7 @@ describe Spree::Admin::PosController do
               flash[:notice].should eq('Adding more than available.')
             end
           end
+          
           it 'should not update discount' do          
             controller.should_not_receive(:apply_discount)
             send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
@@ -440,6 +453,10 @@ describe Spree::Admin::PosController do
         Spree::Variant.stub(:ransack).with({"product_name_cont"=>"test-product", "meta_sort"=>"product_name asc", "deleted_at_null"=>"1", "product_deleted_at_null"=>"1", "published_at_not_null"=>"1"}).and_return(@variants)
       end
       
+      it { controller.should_receive(:check_valid_order).and_return(true) }      
+      it { controller.should_not_receive(:ensure_pos_shipping_method) }
+      it { controller.should_not_receive(:ensure_payment_method) }
+      
       it { Spree::Variant.should_receive(:ransack).with({"product_name_cont"=>"test-product", "meta_sort"=>"product_name asc", "deleted_at_null"=>"1", "product_deleted_at_null"=>"1", "published_at_not_null"=>"1"}).and_return(@variants) }    
       it { @variants.should_receive(:result).with(:distinct => true).and_return(@variants) }
       it { @variants.should_receive(:page).with('1').and_return(@variants) }
@@ -462,7 +479,7 @@ describe Spree::Admin::PosController do
         order.stub(:save_payment_for_pos).with(@payment_method.id.to_s, 'Credit Card').and_return(payment)
         order.stub(:complete_via_pos).and_return(true)
       end
-
+      
       it 'completes order via pos' do
         order.should_receive(:complete_via_pos).and_return(true)
         send_request(:number => order.number, :payment_method_id => @payment_method.id, :card_name => 'Credit Card')
@@ -492,6 +509,10 @@ describe Spree::Admin::PosController do
       end
 
       describe 'adds to order' do
+        it { controller.should_receive(:check_valid_order).and_return(true) }
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        
         it { order.should_receive(:contents).and_return(@order_contents) }
         it { @order_contents.should_receive(:add).with(variant, 1, nil, @shipment).and_return(line_item) }
         it { product.should_receive(:save).and_return(true) }
@@ -550,6 +571,10 @@ describe Spree::Admin::PosController do
       end
 
       describe 'removes from order' do
+        it { controller.should_receive(:check_valid_order).and_return(true) }
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        
         it { order.should_receive(:contents).and_return(@order_contents) }
         it { @order_contents.should_receive(:remove).with(variant, 1, @shipment).and_return(line_item) }
         
@@ -589,6 +614,13 @@ describe Spree::Admin::PosController do
         put :clean_order, params.merge!({:use_route => 'spree'})
       end
 
+      context 'before filters' do
+        it { controller.should_receive(:check_valid_order).and_return(true) }
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        after { send_request({:number => order.number}) }
+      end
+
       it 'calls clean! method on order' do
         order.should_receive(:clean!).and_return(true)
         send_request({:number => order.number})
@@ -610,26 +642,39 @@ describe Spree::Admin::PosController do
         @orders = [order]
         Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
         @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
-        order.stub(:associate_user_for_pos).with('test-user@pos.com', 'test', 'user', '07123456789').and_return(user)
+        order.stub(:associate_user_for_pos).with('test-user@pos.com').and_return(user)
+        order.stub(:save!).and_return(true)
       end
 
       def send_request(params = {})
         post :associate_user, params.merge!({:use_route => 'spree'})
       end
 
+      context 'before filters' do
+        it { controller.should_receive(:check_valid_order).and_return(true) }
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        after { send_request(:number => order.number, :new_email =>'test-user@pos.com') }
+      end
+
       it 'associates user with order' do
-        order.should_receive(:associate_user_for_pos).with('test-user@pos.com', 'test', 'user', '07123456789').and_return(user)
-        send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+        order.should_receive(:associate_user_for_pos).with('test-user@pos.com').and_return(user)
+        send_request(:number => order.number, :new_email =>'test-user@pos.com')
+      end
+
+      it 'saves the changes in order' do
+        order.should_receive(:save!).and_return(true)
+        send_request(:number => order.number, :new_email =>'test-user@pos.com')
       end
 
       context 'if user added successfully' do
         it 'redirects to action show' do
-          send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+          send_request(:number => order.number, :new_email =>'test-user@pos.com')
           response.should redirect_to(:action => :show, :number => order.number)
         end
 
         it 'sets the flash message' do
-          send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+          send_request(:number => order.number, :new_email =>'test-user@pos.com')
           flash[:notice].should eq('Successfully Associated User')
         end
       end
@@ -642,12 +687,12 @@ describe Spree::Admin::PosController do
         end
         
         it 'redirects to action show' do
-          send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+          send_request(:number => order.number, :new_email =>'test-user@pos.com')
           response.should redirect_to(:action => :show, :number => order.number)
         end
 
         it 'sets the flash message' do
-          send_request(:number => order.number, :new_email =>'test-user@pos.com', :first_name => 'test', :last_name => 'user', :phone => '07123456789')
+          send_request(:number => order.number, :new_email =>'test-user@pos.com')
           flash[:error].should eq('Could not add the user:error_message')
         end
       end
@@ -666,6 +711,13 @@ describe Spree::Admin::PosController do
         Spree::PaymentMethod.stub(:where).with(:id => @payment_method.id.to_s).and_return([@payment_method])
         order.stub(:save_payment_for_pos).with(@payment_method.id.to_s, 'Credit Card').and_return(payment)
         order.stub(:complete_via_pos).and_return(true)
+      end
+
+      context 'before filters' do
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_payment_method).and_return(true) }
+        it { controller.should_receive(:check_valid_order).and_return(true) }
+        after { send_request(:number => order.number, :payment_method_id => @payment_method.id, :card_name => 'Credit Card') }
       end
 
       it 'save payment for order' do
@@ -740,7 +792,9 @@ describe Spree::Admin::PosController do
         it { order.stub(:save).and_return(true) }
         it { @shipment.stub(:save).and_return(true) }
         it { order.should_receive(:save).and_return(true) }
-
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        it { controller.should_receive(:check_valid_order).and_return(true) }
         after { send_request(:number => order.number, :stock_location_id => @stock_location.id) }
       end
 
