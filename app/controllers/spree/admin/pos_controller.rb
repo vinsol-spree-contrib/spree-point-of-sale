@@ -47,7 +47,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def associate_user
-    @user = @order.associate_user_for_pos(params[:email] || params[:new_email], params[:first_name], params[:last_name], params[:phone])
+    @user = @order.associate_user_for_pos(params[:email] || params[:new_email])
     if @user.errors.present?
       add_error "Could not add the user:#{@user.errors.full_messages.to_sentence}"
     else

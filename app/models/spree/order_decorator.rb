@@ -33,8 +33,8 @@ Spree::Order.class_eval do
     payment = payments.create(:amount => total, :payment_method_id => payment_method_id, :card_name => card_name)
   end
 
-  def associate_user_for_pos(new_user_email, new_user_first_name, new_user_last_name, new_user_phone)
-    associate_with_user = Spree::User.where(:email => new_user_email).first || Spree::User.create_with_random_password(new_user_email, new_user_first_name, new_user_last_name, new_user_phone)
+  def associate_user_for_pos(new_user_email)
+    associate_with_user = Spree::User.where(:email => new_user_email).first || Spree::User.create_with_random_password(new_user_email)
     associate_user!(associate_with_user) if associate_with_user.valid?
     associate_with_user
   end
