@@ -69,12 +69,6 @@ No Result Found
         <%= f.text_field :sku_cont, :size => 15 %>
       </p>
       <p>
-        <%if Spree::Variant.instance_methods.include? "ean"%>
-        <%= f.label :ean_eq, Spree.t("ean") %><br />
-        <%= f.text_field :ean_eq, :size => 15 %>
-        <% end %>
-      </p>
-      <p>
         <%= f.label :prices_amount_gteq, Spree.t("price_min") %><br />
         <%= f.text_field :prices_amount_gteq, :size => 15 %>
       </p>

@@ -16,7 +16,7 @@ module Admin::BarcodeHelper
   end
 
   def get_barcode(variant)
-    code = variant.respond_to?(:ean) ? variant.ean : variant.sku
+    code = variant.sku
     return code ? ::Barby::Code128B.new( code  ) : code
   end
 
