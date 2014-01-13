@@ -13,6 +13,9 @@ Spree::Core::Engine.routes.prepend do
     # match "pos/print/:number" => "pos#print"
     match "pos/associate_user/:number" => "pos#associate_user"
     match "pos/update_payment/:number" => "pos#update_payment"
+    match "pos/update_line_item_quantity/:number" => "pos#update_line_item_quantity" 
+    match "pos/apply_discount/:number" => "pos#apply_discount" 
+
 #    match "pos/export" => "pos#export" 
 #    match "pos/import" => "pos#import" 
     match "pos/index" => "pos#new"

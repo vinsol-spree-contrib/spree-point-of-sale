@@ -50,7 +50,7 @@
   <% end %>
   <div class="search">
     <legend>Search & Add Product </legend>
-    <%= form_tag "/admin/pos/show/#{@order.number}" , :id => "product_search" do  %>
+    <%= form_tag("/admin/pos/find/#{@order.number}", :method => :get, :id => "product_search") do  %>
       <input type="hidden" value="1" name="index">
       <div class="box">
         <p> <%= text_field_tag :sku, "" , :size => 15 %> <%= button Spree.t("search") %> </p>
@@ -130,7 +130,7 @@
   <tr>
     <td width="220"><%=  image_tag item.variant.product.images.first.attachment.url(:mini) if item.variant.product.images.first %> <%= "#{item.variant.name} #{item.variant.options_text}"%><br/>
       <%="(SKU:#{item.variant.sku})" %></td>
-    <td><%= form_tag do %> <%= hidden_field_tag(:line_item_id, item.id) %> <%= select_tag("quantity" , options_for_select( (1..20).to_a , item.quantity), :onchange => 'this.form.submit()')%>
+    <td><%= form_tag("/admin/pos/update_line_item_quantity/#{@order.number}") do %> <%= hidden_field_tag(:line_item_id, item.id) %> <%= select_tag("quantity" , options_for_select( (1..20).to_a , item.quantity), :onchange => 'this.form.submit()')%>
       <%end%></td>
     <td><%= item.variant.price %></td>
     <td><%= (((item.variant.price - item.price)/item.variant.price)*100).round(1) %></td>
@@ -140,7 +140,7 @@
       <% end %>
       </big></td>
     <td align="center"><%= link_to image_tag("admin/pos/del_16.png") , "/admin/pos/remove/#{@order.number}/#{item.variant.id}"  %> <%= link_to image_tag("admin/pos/plus_16.png") , "/admin/pos/add/#{@order.number}/#{item.variant.id}"    %></td>
-    <td><big> <%= form_tag do %> <%= hidden_field_tag(:item, item.id) %> <%= text_field_tag("discount") %> <%= submit_tag 'update' %>
+    <td><big> <%= form_tag("/admin/pos/apply_discount/#{@order.number}") do %> <%= hidden_field_tag(:item, item.id) %> <%= text_field_tag("discount") %> <%= submit_tag 'update' %>
       <%end%>
       </big></td>
   </tr>

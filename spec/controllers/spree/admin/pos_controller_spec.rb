@@ -94,7 +94,6 @@ describe Spree::Admin::PosController do
         describe 'loads and checks order' do
           # it { Spree::Order.should_receive(:where).with(:number => order.number).and_return([order]) }
           it { order.should_receive(:paid?).and_return(false) }
-          it { controller.request.should_receive(:post?).and_return(false) }
 
           after { send_request({ :number => order.number, :line_item_id => 1 }) }
         end
@@ -131,7 +130,7 @@ describe Spree::Admin::PosController do
         context 'response' do
           before { send_request }
 
-          it { flash[:error].should eq("You have an upaid/empty order. Please either complete it or update items in the same order.") }
+          it { flash[:error].should eq("You have an unpaid/empty order. Please either complete it or update items in the same order.") }
           it { response.should_not redirect_to('/') }
         end
       end
@@ -296,7 +295,7 @@ describe Spree::Admin::PosController do
 
       context 'pending pos order present' do
         it 'adds error' do
-          controller.should_receive(:add_error).with("You have an upaid/empty order. Please either complete it or update items in the same order.").and_return(true)
+          controller.should_receive(:add_error).with("You have an unpaid/empty order. Please either complete it or update items in the same order.").and_return(true)
           send_request
         end
 
@@ -331,106 +330,73 @@ describe Spree::Admin::PosController do
       end
     end
 
-    describe 'show' do
+    describe 'update_line_item_quantity' do
       before do
         @orders = [order]
         Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
         @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
+        @line_items = [line_item]
+        order.stub(:line_items).and_return(@line_items)
+        @line_items.stub(:where).and_return(@line_items)
+        line_item.stub(:save).and_return(true)
+        line_item.stub(:variant).and_return(variant)
+        line_item.stub(:quantity=).with(2).and_return(true)
       end
 
       def send_request(params = {})
-        post :show, params.merge!({:use_route => 'spree'})
+        post :update_line_item_quantity, params.merge!({:use_route => 'spree'})
       end
 
-      context 'line_item_id passed' do
-        context 'post request' do
-          before do
-            @line_items = [line_item]
-            order.stub(:line_items).and_return(@line_items)
-            @line_items.stub(:where).and_return(@line_items)
-            line_item.stub(:quantity=).with(2).and_return(true)
-            line_item.stub(:save).and_return(true)
-            line_item.stub(:variant).and_return(variant)
-          end
+      context 'update_line_item_quantity' do
+        it { controller.should_receive(:check_valid_order).and_return(true) }
+        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_not_receive(:ensure_payment_method) }
+        it { order.should_receive(:line_items).and_return(@line_items) }
+        it { line_item.should_receive(:quantity=).with(2).and_return(true) }
+        it { line_item.should_receive(:save).and_return(true) }
+        it { order.should_receive(:reload).and_return(true) }
+        after { send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2) }
+      end
 
-          context 'update_line_item_quantity' do
-            it { controller.should_receive(:check_valid_order).and_return(true) }
-            it { controller.should_not_receive(:ensure_pos_shipping_method) }
-            it { controller.should_not_receive(:ensure_payment_method) }
-            it { order.should_receive(:line_items).and_return(@line_items) }
-            it { line_item.should_receive(:quantity=).with(2).and_return(true) }
-            it { line_item.should_receive(:save).and_return(true) }
-            it { order.should_receive(:reload).and_return(true) }
-            after { send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2) }
-          end
-
-          context 'updated successfully' do
-            it 'sets flash message' do
-              send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
-              flash[:notice].should eq('Quantity Updated')
-            end
-          end
-
-          context 'not updated successfully' do
-            before { line_item.stub(:errors).and_return(:base => 'error') }
-            it 'sets flash message' do
-              send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
-              flash[:notice].should eq('Adding more than available.')
-            end
-          end
-          
-          it 'should not update discount' do          
-            controller.should_not_receive(:apply_discount)
-            send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
-          end
-          
-          it 'checks for pos request' do
-            controller.request.should_receive(:post?).and_return(true)
-            send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
-          end
-        end
-
-        context 'not post request' do
-          def send_request(params = {})
-            get :show, params.merge!({:use_route => 'spree'})
-          end
-          it { controller.should_not_receive(:update_line_item_quantity) }
-          it { controller.should_not_receive(:apply_discount) }
-          it { controller.request.should_receive(:post?).and_return(false) }
-          after { send_request(:number => order.number, :line_item_id => 1) }
+      context 'updated successfully' do
+        it 'sets flash message' do
+          send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
+          flash[:notice].should eq('Quantity Updated')
         end
       end
 
-      context 'discount passed' do
-        before do
-          @line_items = [line_item]
-          order.stub(:line_items).and_return(@line_items)
-          @line_items.stub(:where).and_return(@line_items)
-          line_item.stub(:variant).and_return(variant)
-          line_item.stub(:save).and_return(true)
-          line_item.stub(:price=).with(18.0).and_return(true)
+      context 'not updated successfully' do
+        before { line_item.stub(:errors).and_return(:base => 'error') }
+        it 'sets flash message' do
+          send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2)
+          flash[:notice].should eq('Adding more than available.')
         end
+      end          
+    end
 
-        context 'applies discount' do
-          it { order.stub(:line_items).and_return(@line_items) }
-          it { line_item.stub(:variant).and_return(variant) }
-          it { order.stub(:reload).and_return(true) }
-          it { line_item.stub(:save).and_return(true) }
-          it { line_item.stub(:price=).with(18.0).and_return(true) }
-          after { send_request(:number => order.number, :discount => 10, :item => line_item.id) }
-        end
-
-        it 'should not update line items quantity' do
-          controller.should_not_receive(:update_line_item_quantity) 
-          send_request(:number => order.number, :discount => 10, :item => line_item.id)
-        end
+    describe ' apply discount' do
+      def send_request(params = {})
+        post :apply_discount, params.merge!({:use_route => 'spree'})
       end
 
-      context 'search params passed' do
-        it { controller.should_not_receive(:update_line_item_quantity) }
-        it { controller.should_not_receive(:apply_discount) }
-        after { send_request(:number => order.number, :sku => 1) }
+      before do
+        @orders = [order]
+        Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
+        @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
+        @line_items = [line_item]
+        order.stub(:line_items).and_return(@line_items)
+        @line_items.stub(:where).and_return(@line_items)
+        line_item.stub(:save).and_return(true)
+        line_item.stub(:variant).and_return(variant)
+        line_item.stub(:price=).with(18.0).and_return(true)
       end
+
+      it { order.stub(:line_items).and_return(@line_items) }
+      it { line_item.stub(:variant).and_return(variant) }
+      it { order.stub(:reload).and_return(true) }
+      it { line_item.stub(:save).and_return(true) }
+      it { line_item.stub(:price=).with(18.0).and_return(true) }
+      after { send_request(:number => order.number, :discount => 10, :item => line_item.id) }
     end
 
     describe 'find' do

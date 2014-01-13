@@ -7,16 +7,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def new
     @order = spree_current_user.unpaid_pos_orders.first
-    @order ? add_error("You have an upaid/empty order. Please either complete it or update items in the same order.") : init_pos
+    @order ? add_error("You have an unpaid/empty order. Please either complete it or update items in the same order.") : init_pos
     redirect_to :action => :show , :number => @order.number
-  end
-
-  def show
-    update_line_item_quantity if params[:line_item_id] && request.post?
-
-    apply_discount if params[:discount]
-      
-    redirect_to :action => :find , "q[product_name_cont]" => params[:sku] and return if params[:sku]
   end
 
   def find
@@ -38,6 +30,30 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     line_item = @order.contents.remove(@variant, 1, @order.shipment)
     flash.notice = line_item.quantity != 0 ? 'Quantity Updated' : Spree.t('product_removed') 
     redirect_to :action => :show, :number => @order.number
+  end
+
+  def update_line_item_quantity
+    item = @order.line_items.where(:id => params[:line_item_id]).first
+    #TODO error handling
+    item.quantity = params[:quantity].to_i
+    item.save
+    #[TODO] Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
+    @order.reload # must be something cached in there, because it doesnt work without. shame.
+    flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
+    redirect_to :action => :show
+  end
+
+  def apply_discount
+    if VALID_DISCOUNT_REGEX.match(params[:discount]) && params[:discount].to_f < 100
+      @discount = params[:discount].to_f
+      item = @order.line_items.where(:id => params[:item]).first
+      item.price = item.variant.price * ( 1.0 - @discount/100.0 )
+      @order.reload # must be something cached in there, because it doesnt work without. shame.
+      item.save
+    else
+      flash[:notice] = 'Please enter a valid discount'
+    end
+    redirect_to :action => :show
   end
 
   def clean_order
@@ -77,6 +93,17 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     redirect_to :action => :show, :number => @order.number
   end
   
+  def update_line_item_quantity
+    item = @order.line_items.where(:id => params[:line_item_id]).first
+    #TODO error handling
+    item.quantity = params[:quantity].to_i
+    item.save
+    #[TODO] Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
+    @order.reload # must be something cached in there, because it doesnt work without. shame.
+    flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
+    redirect_to :action => :show
+  end
+
   private 
   
   def ensure_pos_shipping_method
@@ -151,27 +178,5 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.complete_via_pos
     url = SpreePos::Config[:pos_printing].sub("number" , @order.number.to_s)
     redirect_to url
-  end
-
-  def update_line_item_quantity
-    item = @order.line_items.where(:id => params[:line_item_id]).first
-    #TODO error handling
-    item.quantity = params[:quantity].to_i
-    item.save
-    #TODO Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
-    @order.reload # must be something cached in there, because it doesnt work without. shame.
-    flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
-  end
-
-  def apply_discount
-    if VALID_DISCOUNT_REGEX.match(params[:discount]) && params[:discount].to_f < 100
-      @discount = params[:discount].to_f
-      item = @order.line_items.where(:id => params[:item]).first
-      item.price = item.variant.price * ( 1.0 - @discount/100.0 )
-      @order.reload # must be something cached in there, because it doesnt work without. shame.
-      item.save
-    else
-      flash[:notice] = 'Please enter a valid discount'
-    end
   end
 end
