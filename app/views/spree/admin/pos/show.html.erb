@@ -1,6 +1,5 @@
 <% content_for :head do -%>
   <%= javascript_include_tag 'admin/spree_pos' %>
-  <%= stylesheet_link_tag 'admin/spree_pos' %>
 <% end %>
 <% content_for :sidebar do %>
   <% if user_stock_locations(spree_current_user).count > 1 %>
