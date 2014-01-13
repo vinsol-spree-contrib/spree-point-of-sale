@@ -22,7 +22,6 @@ describe Spree::Admin::PosController do
     role.stub(:ability).and_return(true)
     variant.stub(:product).and_return(product)
     product.stub(:save).and_return(true)
-    order.stub(:reload).and_return(true)      
     order.stub(:is_pos?).and_return(true)
     order.stub(:paid?).and_return(false)
   end
@@ -354,7 +353,6 @@ describe Spree::Admin::PosController do
         it { order.should_receive(:line_items).and_return(@line_items) }
         it { line_item.should_receive(:quantity=).with(2).and_return(true) }
         it { line_item.should_receive(:save).and_return(true) }
-        it { order.should_receive(:reload).and_return(true) }
         after { send_request(:number => order.number, :line_item_id => line_item.id, :quantity => 2) }
       end
 
@@ -391,11 +389,10 @@ describe Spree::Admin::PosController do
         line_item.stub(:price=).with(18.0).and_return(true)
       end
 
-      it { order.stub(:line_items).and_return(@line_items) }
-      it { line_item.stub(:variant).and_return(variant) }
-      it { order.stub(:reload).and_return(true) }
-      it { line_item.stub(:save).and_return(true) }
-      it { line_item.stub(:price=).with(18.0).and_return(true) }
+      it { order.should_receive(:line_items).and_return(@line_items) }
+      it { line_item.should_receive(:variant).and_return(variant) }
+      it { line_item.should_receive(:save).and_return(true) }
+      it { line_item.should_receive(:price=).with(18.0).and_return(true) }
       after { send_request(:number => order.number, :discount => 10, :item => line_item.id) }
     end
 
@@ -749,14 +746,14 @@ describe Spree::Admin::PosController do
       end
 
       describe 'updates order addresses and update shipment' do
-        it { @stock_location.stub(:address).and_return(address) }
-        it { order.stub(:ship_address=).with(address).and_return(address) }
-        it { order.stub(:bill_address=).with(address).and_return(address) }
-        it { @shipment.stub(:stock_location=).with(@stock_location).and_return(@stock_location) }
-        it { @shipment.stub(:stock_location).and_return(@stock_location) }
-        it { order.stub(:shipment).and_return(@shipment) }
-        it { order.stub(:save).and_return(true) }
-        it { @shipment.stub(:save).and_return(true) }
+        it { @stock_location.should_receive(:address).and_return(address) }
+        it { order.should_receive(:ship_address=).with(address).and_return(address) }
+        it { order.should_receive(:bill_address=).with(address).and_return(address) }
+        it { @shipment.should_receive(:stock_location=).with(@stock_location).and_return(@stock_location) }
+        it { @shipment.should_receive(:stock_location).and_return(@stock_location) }
+        it { order.should_receive(:shipment).and_return(@shipment) }
+        it { order.should_receive(:save).and_return(true) }
+        it { @shipment.should_receive(:save).and_return(true) }
         it { order.should_receive(:save).and_return(true) }
         it { controller.should_not_receive(:ensure_pos_shipping_method) }
         it { controller.should_not_receive(:ensure_payment_method) }

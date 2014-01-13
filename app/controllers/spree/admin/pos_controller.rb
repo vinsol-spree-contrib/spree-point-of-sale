@@ -37,8 +37,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     #TODO error handling
     item.quantity = params[:quantity].to_i
     item.save
-    #[TODO] Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
-    @order.reload # must be something cached in there, because it doesnt work without. shame.
+
     flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
     redirect_to :action => :show
   end
@@ -46,9 +45,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def apply_discount
     if VALID_DISCOUNT_REGEX.match(params[:discount]) && params[:discount].to_f < 100
       @discount = params[:discount].to_f
-      item = @order.line_items.where(:id => params[:item]).first
+      item = @order.line_items.where(:id => params[:line_item_id]).first
       item.price = item.variant.price * ( 1.0 - @discount/100.0 )
-      @order.reload # must be something cached in there, because it doesnt work without. shame.
       item.save
     else
       flash[:notice] = 'Please enter a valid discount'
@@ -91,17 +89,6 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.save
     @order.shipment.save
     redirect_to :action => :show, :number => @order.number
-  end
-  
-  def update_line_item_quantity
-    item = @order.line_items.where(:id => params[:line_item_id]).first
-    #TODO error handling
-    item.quantity = params[:quantity].to_i
-    item.save
-    #[TODO] Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
-    @order.reload # must be something cached in there, because it doesnt work without. shame.
-    flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
-    redirect_to :action => :show
   end
 
   private 

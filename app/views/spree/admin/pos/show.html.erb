@@ -140,7 +140,7 @@
       <% end %>
       </big></td>
     <td align="center"><%= link_to image_tag("admin/pos/del_16.png") , "/admin/pos/remove/#{@order.number}/#{item.variant.id}"  %> <%= link_to image_tag("admin/pos/plus_16.png") , "/admin/pos/add/#{@order.number}/#{item.variant.id}"    %></td>
-    <td><big> <%= form_tag("/admin/pos/apply_discount/#{@order.number}") do %> <%= hidden_field_tag(:item, item.id) %> <%= text_field_tag("discount") %> <%= submit_tag 'update' %>
+    <td><big> <%= form_tag("/admin/pos/apply_discount/#{@order.number}") do %> <%= hidden_field_tag(:line_item_id, item.id) %> <%= text_field_tag("discount") %> <%= submit_tag 'update' %>
       <%end%>
       </big></td>
   </tr>

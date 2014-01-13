@@ -1,0 +1,25 @@
+<table width="700" cellspacing="0" cellpadding="7" border="0" class="line_items" style="border:solid 1px #cccccc; border-bottom:none; margin:30px 0;" >
+  <% @order.adjustments.eligible.each do |adjustment| %>
+  <tr class="total">
+    <td class="cel1 bold" style="border-bottom:solid 1px #cccccc;"><font face="Arial, Helvetica, sans-serif" size="2"><%= adjustment.label %>:</font></td>
+    <td class="cel2 cell" align="right" style="border-bottom:solid 1px #cccccc;"><font face="Arial, Helvetica, sans-serif" size="2"><%= adjustment.display_amount.to_html %></font></td>
+  </tr>
+  <% end %>
+  <tr>
+    <td class="cel1 bold" style="border-bottom:solid 1px #cccccc;"><font face="Arial, Helvetica, sans-serif" size="2"><strong><%= t(:order_total) %>:</strong></font></td>
+    <td class="cel2 cell" align="right" style="border-bottom:solid 1px #cccccc;"><font face="Arial, Helvetica, sans-serif" size="2"><strong><span id='summary-order-total'><%= number_to_currency @order.total %></span></strong></font></td>
+  </tr>
+  <% if @order.price_adjustment_totals.present? %>
+  <tr>
+    <td class="cel1" style="border-bottom:solid 1px #cccccc;" style="border-bottom:solid 1px #cccccc;"></td>
+    <td class="cel2" style="border-bottom:solid 1px #cccccc;"></td>
+  </tr>
+  <% @order.price_adjustment_totals.keys.each do |key| %>
+  <% next unless @order.price_adjustment_totals[key] %>
+  <tr class="total">
+    <td class="cel1 bold" style="border-bottom:solid 1px #cccccc;"><font face="Arial, Helvetica, sans-serif" size="2"><%= key %>:</font></td>
+    <td class="cel2 cell" align="right" style="border-bottom:solid 1px #cccccc;"><font face="Arial, Helvetica, sans-serif" size="2"><%= number_to_currency @order.price_adjustment_totals[key] %></font></td>
+  </tr>
+  <% end %>
+  <% end %>
+</table>
