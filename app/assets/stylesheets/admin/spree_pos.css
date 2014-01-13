@@ -1,0 +1,104 @@
+body { color:#000 !important; background: url("/assets/header_bg.png") repeat-x 0px 110px; font-size:12px !important;}
+
+.pt20 { padding-top:20px;}
+.fr { float:right;}
+
+[data-hook="admin_login_navigation_bar"] ul li,
+a { color:#000 !important;}
+input[type="submit"], 
+input[type="button"], 
+button,
+.button { background:#bbbbbb; color:#000 !important; text-transform:capitalize;}
+
+input[type="submit"]:hover, 
+input[type="button"]:hover, 
+button:hover,
+.button:hover { background:#333333; color:#fff !important;}
+
+input[type="text"], 
+.select2-search input, 
+.select2-container-multi 
+.select2-choices, 
+input[type="password"], 
+input[type="email"], 
+input[type="date"], 
+input[type="datetime"], 
+input[type="time"], 
+input[type="url"], 
+input[type="number"], 
+input[type="tel"], 
+textarea, 
+fieldset { border-color:#bbbbbb !important;}
+
+input[type="text"]:focus, 
+.select2-search input:focus, 
+.select2-container-multi 
+.select2-choices:focus, 
+input[type="password"]:focus, 
+input[type="email"]:focus, 
+input[type="date"]:focus, 
+input[type="datetime"]:focus, 
+input[type="time"]:focus, 
+input[type="url"]:focus, 
+input[type="number"]:focus, 
+input[type="tel"]:focus, 
+textarea:focus, 
+fieldset:focus { border-color:#333333 !important;}
+input[type="submit"], input[type="button"], button, .button { font-weight:normal !important; font-size:11px !important;}
+
+
+
+table { border-top:solid 1px #dddddd;}
+table th { border-color:#dddddd; font-size:13px !important; }
+table td { border-color:#dddddd; font-size:11px !important; }
+#header { background:none; height:110px; padding:0 !important;}
+figure[data-hook="logo-wrapper"] { float:left; position:absolute; z-index:999; left:0; top:0; padding:32px 10px 0 10px !important; margin:0 !important; background:#fff;}
+figure[data-hook="logo-wrapper"]  a { display:block; float:left; background: url("/assets/logo.png") no-repeat 0px 0px #fff; width:220px; height:145px; text-indent:-9999px; }
+.container .eleven.columns { float:right;}
+
+#admin-menu { background:none; padding-bottom:40px;}
+.main-menu-wrapper { float:right; background:none;}
+.fullwidth-menu { width:auto !important; float:right !important; }
+.fullwidth-menu li { width:auto !important;  }
+.fullwidth-menu li a { width:auto !important; background:none !important; padding:8px !important; }
+#admin-menu li a:hover:after, 
+#admin-menu li.selected a:after { border:none !important; }
+#admin-menu li a {color:#000 !important;}
+[data-hook="admin_login_navigation_bar"] ul li[data-hook="user-logged-in-as"] { color:#666;}
+
+#sidebar { border-top:none !important; margin-top:0 !important; position:relative;}
+/*#sidebar legend { padding:40px 0 10px 0 !important; font-family:Georgia, "Times New Roman", Times, serif; letter-spacing:2px; text-transform:uppercase;}*/
+
+
+
+.belowtable { display:inline-block; width:100%; text-align:right;}
+.belowtable div { float:left;}
+
+h3 { padding:40px 0 0 0 !important; font-family:Georgia, "Times New Roman", Times, serif; letter-spacing:2px; text-transform:uppercase; font-size:13px; color:#000 !important; font-weight:normal !important; border-bottom:solid 1px #ccc;}
+h5 { display:inline-block; width:100%; padding-bottom:10px; color:#000 !important;}
+h5 .button { float:right; line-height:normal !important; font-size:12px !important; font-size:11px; font-weight:normal; background:#5498DA !important; color:#fff !important; padding:5px 15px !important;}
+
+table th img, table td img { border:none !important; padding:0 10px;}
+
+.box p { padding-top:10px;}
+.box p label { color:#000; padding-bottom:4px;}
+.form-buttons { text-align:left !important;}
+
+#update_payment p { display:inline-block; width:100%; padding:10px 0 0 0;}
+#update_payment ul { display:inline-block; width:100%; padding:10px 0;}
+
+table.index, .commonfieldset, table th:first-child, table td:first-child { border-color:#dddddd !important;}
+.commonfieldset legend { background-color:#dddddd !important;}
+input { color:#333 !important;}
+table tbody tr:hover td { background-color:#eeeeee !important;}
+label { color:#333333 !important;}
+.or_separator, .or_separator span { border-color:#dddddd !important;}
+
+.tabbing .ui-tabs-nav { background:none !important;}
+.tabbing .ui-tabs-nav .ui-state-default .ui-tabs-anchor { background-color:#ddd !important; color:#000 !important; border-radius:3px;}
+.tabbing .ui-tabs-nav .ui-state-active .ui-tabs-anchor { background-color:#bbbbbb !important; }
+.tabbing .ui-tabs-nav .ui-state-active .ui-tabs-anchor:after { border-top-color:#bbbbbb !important;}
+.rows { display:inline-block; width:100%;}
+
+#update_payment label { width:auto !important; padding-right:15px !important;}
+#card_name { margin-top:10px;}

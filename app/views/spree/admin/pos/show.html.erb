@@ -1,36 +1,6 @@
 <% content_for :head do -%>
-<SCRIPT TYPE="text/javascript">
-  <!--
-  var newwindow;
-  function poptastic(url)
-  { newwindow=window.open(url,'Print','width=400,left=300,top=50,resizable=no,scrollbars=yes,toolbar=yes,status=no');
-    if (window.focus) {newwindow.focus()}
-  }
-  //-->
-  $( document ).ready(function() {
-    $(function() {
-      $( ".tabbing" ).tabs();
-      $("#update_payment input[name='payment_id']:first").click();
-    });
-  });
-
-  $( document ).ready(function() {
-    $( "#associate_user_toggle" ).click(function() {
-      $( "#associate_user" ).slideToggle( "slow", function() {
-      });
-    });
-
-    $('#update_payment input[type=radio]').click(function() {
-      $('#card_name_options').val('');
-      $('#card_name_options').hide();
-    });
-
-    $('#update_payment input[type=radio][data-name ~= card],#update_payment input[type=radio][data-name ~= Card]').click(function() {
-      $('#card_name_options').show();
-    });
-  });
-  </SCRIPT>
-<%= stylesheet_link_tag 'admin/pos_admin' if only_pos_admin_access? %>
+  <%= javascript_include_tag 'admin/spree_pos' %>
+  <%= stylesheet_link_tag 'admin/spree_pos' %>
 <% end %>
 <% content_for :sidebar do %>
   <% if user_stock_locations(spree_current_user).count > 1 %>
@@ -57,18 +27,11 @@
       </div>
     <% end %>
   </div>
-
-  <script type="text/javascript" language="JavaScript">
-    document.getElementById('sku').focus();
-  </script>
-  <% @pix = 30 %>
   <br/><br/><br/><br/>
   <a href="/admin/pos/export" target="_blank">
   <%  image_tag("admin/pos/export.jpg" )   #if Spree::Config[:pos_export] %>
   </a>
 <%end%>
-
-<%= render 'spree/shared/error_messages', :target => @pos %>
 
 <h5>Order No: <%= @order.number %>
   <a href="/admin/pos/new" onClick="javascript:if (newwindow) newwindow.close()" class="create_order button"> 

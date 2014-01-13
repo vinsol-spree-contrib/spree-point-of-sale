@@ -12,7 +12,7 @@ module Admin::BarcodeHelper
 
   def current_symbol
     @currency = Spree::Config[:currency]
-    @currency == 'NGN' ? 'N' : Money::Currency.table.select { |key, value| value.has_value?(currency) }.values[0][:symbol]
+    @currency == 'NGN' ? 'N' : Money::Currency.table.select { |key, value| value.has_value?(@currency) }.values[0][:symbol]
   end
 
   def get_barcode(variant)

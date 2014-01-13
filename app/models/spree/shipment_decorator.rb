@@ -1,10 +1,10 @@
 Spree::Shipment.class_eval do
 
   def finalize_pos
-    self.state = "delivered"
+    self.state = "shipped"
     inventory_units.each &:ship!
     self.save
-    update_delivered_at
+    touch :delivered_at
   end
 
 end

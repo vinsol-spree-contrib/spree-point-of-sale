@@ -1,9 +1,9 @@
 class AddEan < ActiveRecord::Migration
   def up
-    add_column :variants, :ean, :string    
+    add_column :spree_variants, :ean, :string    
   end
 
   def down
-    remove_column :variants, :ean
+    remove_column :spree_variants, :ean
   end
 end
