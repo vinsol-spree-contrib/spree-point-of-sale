@@ -1,15 +1,19 @@
 class Spree::Admin::PosController < Spree::Admin::BaseController
-  before_filter :check_valid_order, :except => [:new]
+  before_filter :load_order, :except => [:new]
+  before_filter :ensure_pos_order, :except => [:new]
+  before_filter :ensure_unpaid_order, :except => [:new]
+
   helper_method :user_stock_locations
   before_filter :load_variant, :only => [:add, :remove]
   before_filter :ensure_pos_shipping_method, :only => [:new]
   before_filter :ensure_payment_method, :only => [:update_payment]
   before_filter :ensure_existing_user, :only => [:associate_user]
-  
+  before_filter :check_unpaid_pos_order, :only => :new
+  before_filter :load_line_item, :only => [:update_line_item_quantity, :apply_discount]
+
   def new
-    @order = spree_current_user.unpaid_pos_orders.first
-    @order ? add_error("You have an unpaid/empty order. Please either complete it or update items in the same order.") : init_pos
-    redirect_to :action => :show , :number => @order.number
+    init_pos
+    redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   def find
@@ -18,47 +22,45 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     #using the scope available_at_stock_location which should be defined according to app or removed if not required
     stock_location = user_stock_locations(spree_current_user).first
     @search = Spree::Variant.includes([:product]).available_at_stock_location(stock_location.id).ransack(params[:q])
-    @variants = @search.result(:distinct => true).page(params[:page]).per(20)
+    @variants = @search.result(:distinct => true).page(params[:page]).per(PRODUCTS_PER_SEARCH_PAGE)
   end
 
   def add
-    @line_item = add_variant(@variant) if @variant.present?
-    flash.notice = @line_item.errors[:base].present? ? 'Adding more than available' : Spree.t('product_added') if @line_item
-    redirect_to :action => :show, :number => @order.number 
+    @item = add_variant(@variant) if @variant.present?
+    flash[:notice] = Spree.t('product_added') if @item.errors.blank?
+    flash[:error] = @item.errors.full_messages.to_sentence if @item.errors.present?
+    redirect_to admin_pos_show_order_path(:number => @order.number) 
   end
 
   def remove
     line_item = @order.contents.remove(@variant, 1, @order.shipment)
-    flash.notice = line_item.quantity != 0 ? 'Quantity Updated' : Spree.t('product_removed') 
-    redirect_to :action => :show, :number => @order.number
+    flash.notice = line_item.quantity.zero? ? Spree.t('product_removed') : 'Quantity Updated' 
+    redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   def update_line_item_quantity
-    item = @order.line_items.where(:id => params[:line_item_id]).first
-    #TODO error handling
-    item.quantity = params[:quantity].to_i
-    item.save
+    @item.quantity = params[:quantity]
+    @item.save
 
-    flash.notice = item.errors[:base].present? ? 'Adding more than available.' : 'Quantity Updated'      
-    redirect_to :action => :show
+    flash[:notice] = 'Quantity Updated' if @item.errors.blank?
+    flash[:error] = @item.errors.full_messages.to_sentence if @item.errors.present?
+    redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   def apply_discount
-    if VALID_DISCOUNT_REGEX.match(params[:discount]) && params[:discount].to_f < 100
-      @discount = params[:discount].to_f
-      item = @order.line_items.where(:id => params[:line_item_id]).first
-      item.price = item.variant.price * ( 1.0 - @discount/100.0 )
-      item.save
+    discount = params[:discount].try(:to_f)
+    if VALID_DISCOUNT_REGEX.match(params[:discount]) && discount < 100
+      @item.price = @item.variant.price * ( 1.0 - discount/100.0 )
+      @item.save
     else
       flash[:notice] = 'Please enter a valid discount'
     end
-    redirect_to :action => :show
+    redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   def clean_order
     @order.clean!
-    flash[:notice] = "Removed all items"
-    redirect_to :action => :show, :number => @order.number
+    redirect_to admin_pos_show_order_path(:number => @order.number), :notice => "Removed all items"
   end
 
   def associate_user
@@ -70,7 +72,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       flash[:notice] = 'Successfully Associated User'
     end
 
-    redirect_to :action => :show, :number => @order.number
+    redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   def update_payment
@@ -80,7 +82,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
       print
     else
       add_error @payment.errors.full_messages.to_sentence
-      redirect_to :action => :show, :number => @order.number
+      redirect_to admin_pos_show_order_path(:number => @order.number)
     end
   end
 
@@ -89,15 +91,40 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @order.bill_address = @order.ship_address = @order.shipment.stock_location.address
     @order.save
     @order.shipment.save
-    redirect_to :action => :show, :number => @order.number
+    redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   private 
   
+  def ensure_pos_order
+    unless @order.is_pos?
+      flash[:error] = 'This is not a pos order'
+      render :show
+    end
+  end
+
+  def ensure_unpaid_order
+    if @order.paid?
+      flash[:error] = 'This order is already completed. Please use a new one.'
+      render :show
+    end
+  end
+
+  def load_line_item
+    @item = @order.line_items.where(:id => params[:line_item_id]).first
+  end
+
+  def check_unpaid_pos_order
+    if spree_current_user.unpaid_pos_orders.present?
+      add_error("You have an unpaid/empty order. Please either complete it or update items in the same order.")
+      redirect_to admin_pos_show_order_path(:number => spree_current_user.unpaid_pos_orders.first.number)
+    end
+  end
+
   def ensure_existing_user 
     invalid_user_message = "No user with email #{params[:email]}" if params[:email].present? && Spree::User.where(:email => params[:email]).blank?
     invalid_user_message = "User Already exists for the email #{params[:new_email]}" if params[:new_email].present? && Spree::User.where(:email => params[:new_email]).present?
-    redirect_to admin_pos_show_order_path, :flash => {:error => invalid_user_message} if invalid_user_message
+    redirect_to admin_pos_show_order_path(:number => @order.number), :flash => { :error => invalid_user_message } if invalid_user_message
   end
 
   def ensure_pos_shipping_method
@@ -118,7 +145,6 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def check_valid_order
-    load_order
     if @order.paid? || !@order.is_pos?
       flash[:error] = 'This order is already completed. Please use a new one.' if @order.paid?
       flash[:error] = 'This is not a pos order' unless @order.is_pos?
@@ -129,7 +155,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def ensure_payment_method
     if Spree::PaymentMethod.where(:id => params[:payment_method_id]).blank?
       flash[:error] = 'Please select a payment method'
-      redirect_to :action => :show, :number => @order.number
+      redirect_to admin_pos_show_order_path(:number => @order.number)
     end
   end
 
@@ -143,9 +169,9 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     session[:pos_order] = @order.number
   end
 
-  def add_error no
+  def add_error error_message
     flash[:error] = "" unless flash[:error]
-    flash[:error] << no
+    flash[:error] << error_message
   end
 
   def add_variant var , quant = 1

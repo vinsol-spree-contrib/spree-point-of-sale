@@ -31,11 +31,11 @@ class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   private
 
   # leave this in here maybe for later, not used anymore
-  def code
-    barcode = get_barcode
-    return unless barcode
-    send_data barcode.to_png(:xdim => 5) , :type => 'image/png', :disposition => 'inline'
-  end
+  # def code
+  #   barcode = get_barcode
+  #   return unless barcode
+  #   send_data barcode.to_png(:xdim => 5) , :type => 'image/png', :disposition => 'inline'
+  # end
 
   def load
     @variant = Spree::Variant.where(:id => params[:id]).first
