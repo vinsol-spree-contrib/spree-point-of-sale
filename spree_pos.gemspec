@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   # s.add_runtime_dependency(%q<spree_core>, ["~> 2.0.0"])
   # s.add_runtime_dependency(%q<spree_backend>, ["~> 2.0.0"])
-  s.add_dependency('spree_html_invoice', [">=0"])
+  # s.add_dependency('spree_html_invoice', [">=0"])
   s.add_dependency(%q<barby>, [">= 0"])
   s.add_dependency(%q<prawn>, [">= 0"])
   s.add_dependency(%q<rqrcode>, [">= 0"])
