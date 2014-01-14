@@ -2,12 +2,17 @@ require 'spec_helper'
 
 describe Spree::Order do
   let(:user) { mock_model(Spree::User, :email => 'test-user@pos.com') }
+  let(:flat_rate_calculator) { Spree::Calculator::Shipping::FlatRate.create! }
+  let(:country) { Spree::Country.create!(:name => 'mk_country', :iso_name => "mk") }
+  let(:state) { country.states.create!(:name => 'mk_state') }
+  let(:store) { Spree::StockLocation.create!(:name => 'store', :store => true, :address1 => "home", :address2 => "town", :city => "delhi", :zipcode => "110034", :country_id => country.id, :state_id => state.id, :phone => "07777676767") }
+ 
   [:state, :is_pos, :completed_at, :payment_state].each do |attribute|
     it { should allow_mass_assignment_of attribute }
   end
 
   before do
-    @order = Spree::Order.create! 
+    @order = Spree::Order.create!(:is_pos => true)
     @order.stub(:total).and_return 100
     @variant = Spree::Variant.new
     @shipment = @order.shipments.new
@@ -32,17 +37,18 @@ describe Spree::Order do
       @unpaid_order = Spree::Order.create!(:payment_state => 'checkout')
     end
 
-    it { Spree::Order.pos.should match_array([@unpaid_pos_order, @paid_pos_order]) }
+    it { Spree::Order.pos.should match_array([@order, @unpaid_pos_order, @paid_pos_order]) }
     it { Spree::Order.unpaid.should match_array([@unpaid_pos_order, @unpaid_order]) }
     it { Spree::Order.unpaid_pos_order.should eq([@unpaid_pos_order]) }
   end
 
   describe '#clean!' do
+    before { @order.stub(:assign_shipment_for_pos).and_return(true) }
     it { @payments.should_receive(:delete_all).and_return(true) }
     it { @line_item.should_receive(:variant).and_return(@variant) }
     it { @line_item.should_receive(:quantity).and_return(1) }
     it { @content.should_receive(:remove).with(@variant, 1, @shipment).and_return(true) }
-    
+    it { @order.should_receive(:assign_shipment_for_pos).and_return(true) }
     after { @order.clean! }
   end
 
@@ -70,15 +76,24 @@ describe Spree::Order do
   describe '#assign_shipment_for_pos' do
     context '#is_pos?' do
       before do
-        @order.stub(:is_pos?).and_return(true)
-        Spree::Shipment.stub(:create_shipment_for_pos_order).and_return(@shipment)       
+        @order = Spree::Order.create!(:is_pos => true)
+        shipping_category = Spree::ShippingCategory.create! :name => 'test-category'
+        @shipping_method = Spree::ShippingMethod.new(:name => 'test-method') { |method| method.calculator = flat_rate_calculator }
+        @shipping_method.shipping_categories << shipping_category
+        @shipping_method.save!
+        SpreePos::Config[:pos_shipping] = @shipping_method.name
       end
 
       describe 'method calls' do
         it { @order.should_receive(:is_pos?).and_return(true) }
-        it { Spree::Shipment.should_receive(:create_shipment_for_pos_order).and_return(@shipment) }        
 
         after { @order.assign_shipment_for_pos }
+      end
+
+      it 'create a shipment for order' do
+        @order.shipments.should be_blank
+        @order.shipments.create_shipment_for_pos_order
+        @order.shipments.count.should eq(1)
       end
     end
 
@@ -87,7 +102,7 @@ describe Spree::Order do
       
       describe 'method calls' do
         it { @order.should_receive(:is_pos?).and_return(false) }
-        it { Spree::Shipment.should_not_receive(:create_shipment_for_pos_order) }        
+        it { @order.shipments.should_not_receive(:create_shipment_for_pos_order) }        
         
         after { @order.assign_shipment_for_pos }
       end      

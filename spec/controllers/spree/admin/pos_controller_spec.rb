@@ -265,7 +265,7 @@ describe Spree::Admin::PosController do
           send_request(:number => order.number, :email => 'non-exist@website.com')
         end
 
-        it { response.should redirect_to(admin_pos_show_order_path) }
+        it { response.should redirect_to(pos_show_order_path) }
         it { flash[:error].should eq("No user with email non-exist@website.com") }
       end
 

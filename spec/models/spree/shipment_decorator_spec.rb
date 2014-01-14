@@ -43,16 +43,16 @@ describe Spree::Shipment do
     it 'looks for the first active store' do
       Spree::StockLocation.should_receive(:stores).and_return(Spree::StockLocation)
       Spree::StockLocation.should_receive(:active).and_return([store])
-      Spree::Shipment.create_shipment_for_pos_order(order)
+      order.shipments.create_shipment_for_pos_order
     end
 
     it 'looks for the config shipping method' do
       Spree::ShippingMethod.should_receive(:where).with(:name => SpreePos::Config[:pos_shipping]).and_return([@shipping_method])
-      Spree::Shipment.create_shipment_for_pos_order(order)
+      order.shipments.create_shipment_for_pos_order
     end
 
     describe 'creates a new shipment for the order' do
-      before { Spree::Shipment.create_shipment_for_pos_order(order) }
+      before { order.shipments.create_shipment_for_pos_order }
       it { order.shipments.count.should eq(1) }
       it { order.shipments.should_not be_blank }
       it { order.shipments.first.shipping_method.should eq(@shipping_method) }

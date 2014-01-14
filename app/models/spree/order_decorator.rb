@@ -8,6 +8,8 @@ Spree::Order.class_eval do
   def clean!
     payments.delete_all
     line_items.each { |line_item| contents.remove(line_item.variant, line_item.quantity, shipment) }
+    #shipment is removed on removing all items, so initializing a new shipment
+    assign_shipment_for_pos
   end
 
   def complete_via_pos
@@ -20,7 +22,7 @@ Spree::Order.class_eval do
   end
 
   def assign_shipment_for_pos 
-    Spree::Shipment.create_shipment_for_pos_order(self) if is_pos?
+    shipments.create_shipment_for_pos_order if is_pos?
   end
 
   def save_payment_for_pos(payment_method_id, card_name = nil)
