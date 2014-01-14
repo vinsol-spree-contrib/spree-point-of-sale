@@ -4,7 +4,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   before_filter :load_variant, :only => [:add, :remove]
   before_filter :ensure_pos_shipping_method, :only => [:new]
   before_filter :ensure_payment_method, :only => [:update_payment]
-
+  before_filter :ensure_existing_user, :only => [:associate_user]
+  
   def new
     @order = spree_current_user.unpaid_pos_orders.first
     @order ? add_error("You have an unpaid/empty order. Please either complete it or update items in the same order.") : init_pos
@@ -61,6 +62,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def associate_user
+    if params[:email] && Spree::User.where(:email => params[:email]).present?
     @user = @order.associate_user_for_pos(params[:email].present? ? params[:email] : params[:new_email])
     if @user.errors.present?
       add_error "Could not add the user:#{@user.errors.full_messages.to_sentence}"
@@ -93,6 +95,12 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   private 
   
+  def ensure_existing_user 
+    invalid_user_message = "No user with email #{params[:email]}" if params[:email].present? && Spree::User.where(:email => params[:email]).blank?
+    invalid_user_message = "User Already exists for the email #{params[:new_email]}" if params[:new_email].present? && Spree::User.where(:email => params[:new_email]).present?
+    redirect_to admin_pos_show_order_path, :flash => {:error => invalid_user_message} if invalid_user_message
+  end
+
   def ensure_pos_shipping_method
     redirect_to '/', :flash => { :error => 'No shipping method available for POS orders. Please assign one.'} and return unless Spree::ShippingMethod.where(:name => SpreePos::Config[:pos_shipping]).first
   end
