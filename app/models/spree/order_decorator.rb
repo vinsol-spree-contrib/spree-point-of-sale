@@ -20,12 +20,7 @@ Spree::Order.class_eval do
   end
 
   def assign_shipment_for_pos 
-    if is_pos?
-      order_shipment = shipments.build
-      order_shipment.stock_location = Spree::StockLocation.active.first
-      order_shipment.shipping_methods << Spree::ShippingMethod.where(:name => SpreePos::Config[:pos_shipping]).first
-      order_shipment.save!
-    end
+    Spree::Shipment.create_shipment_for_pos_order(self) if is_pos?
   end
 
   def save_payment_for_pos(payment_method_id, card_name = nil)

@@ -5,6 +5,8 @@ gem 'mysql2'
 gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.3'
 # Provides basic authentication functionality for testing parts of your engine
 gem 'spree_auth_devise', github: 'spree/spree_auth_devise', :branch => '2-0-stable'
+gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
+gem 'barby'
 
 gemspec
 

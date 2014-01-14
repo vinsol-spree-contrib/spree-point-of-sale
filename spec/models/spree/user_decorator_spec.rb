@@ -16,10 +16,9 @@ describe Spree::User do
   end
 
   describe '.create_with_random_password' do
-    it 'creates a new user' do
+    it 'returns a new user' do
       Spree::User.where(:email => 'test_user@pos.com').should be_blank      
-      Spree::User.create_with_random_password('test_user@pos.com')
-      Spree::User.where(:email => 'test_user@pos.com').should_not be_blank
+      Spree::User.create_with_random_password('test_user@pos.com').should eq(Spree::User.where(:email => 'test_user@pos.com'))
     end
   end
 end

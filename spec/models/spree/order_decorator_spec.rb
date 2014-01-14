@@ -71,26 +71,14 @@ describe Spree::Order do
     context '#is_pos?' do
       before do
         @order.stub(:is_pos?).and_return(true)
-        @stock_location = mock_model(Spree::StockLocation)
-        Spree::StockLocation.stub(:active).and_return([@stock_location])
-        @pos_shipping_method = mock_model(Spree::ShippingMethod)
-        Spree::ShippingMethod.stub(:where).and_return([@pos_shipping_method])
-        @order.stub_chain(:shipments, :build).and_return(@shipment)
-        @shipment.stub(:save!).and_return(true)
+        Spree::Shipment.stub(:create_shipment_for_pos_order).and_return(@shipment)       
       end
 
       describe 'method calls' do
         it { @order.should_receive(:is_pos?).and_return(true) }
-        it { @shipment.should_receive(:save!).and_return(true) }        
+        it { Spree::Shipment.should_receive(:create_shipment_for_pos_order).and_return(@shipment) }        
 
         after { @order.assign_shipment_for_pos }
-      end
-
-      describe 'assigns' do
-        before { @order.assign_shipment_for_pos }
-        
-        it { @shipment.shipping_methods.should eq([@pos_shipping_method]) }
-        it { @shipment.stock_location.should eq(@stock_location) }
       end
     end
 
@@ -99,10 +87,8 @@ describe Spree::Order do
       
       describe 'method calls' do
         it { @order.should_receive(:is_pos?).and_return(false) }
-        it { @order.should_not_receive(:shipments) }
-        it { Spree::ShippingMethod.should_not_receive(:where) }
-        it { Spree::StockLocation.should_not_receive(:active) }        
-
+        it { Spree::Shipment.should_not_receive(:create_shipment_for_pos_order) }        
+        
         after { @order.assign_shipment_for_pos }
       end      
     end

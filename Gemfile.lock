@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/dancinglightning/spree-html-invoice.git
+  revision: 0c834946d451a8bb7b525ca178c0622158637cb7
+  specs:
+    spree_html_invoice (1.1)
+      spree_core (>= 1.0.0)
+
+GIT
   remote: git://github.com/spree/spree.git
   revision: fd61249d79630fac56790d060fbade1958cb36f4
   tag: v2.0.3
@@ -70,11 +77,9 @@ PATH
   specs:
     spree_pos (1.1)
       barby
-      chunky_png
-      prawn
-      rqrcode
-      spree_backend (~> 2.0.3)
-      spree_core (~> 2.0.3)
+      spree_backend (~> 2.0.0)
+      spree_core (~> 2.0.0)
+      spree_html_invoice
 
 GEM
   remote: https://rubygems.org/
@@ -133,7 +138,6 @@ GEM
     bcrypt-ruby (3.1.2)
     builder (3.0.4)
     cancan (1.6.8)
-    chunky_png (1.2.9)
     climate_control (0.0.3)
       activesupport (>= 3.0)
     cocaine (0.5.3)
@@ -233,7 +237,6 @@ GEM
       polyamorous (~> 0.5.0)
     rdoc (3.12.2)
       json (~> 1.4)
-    rqrcode (0.4.2)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
@@ -288,8 +291,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  barby
   database_cleaner
   mysql2
+  prawn
   rails (= 3.2.16)
   rspec-html-matchers
   rspec-rails (~> 2.10)
@@ -297,4 +302,5 @@ DEPENDENCIES
   simplecov
   spree!
   spree_auth_devise!
+  spree_html_invoice!
   spree_pos!

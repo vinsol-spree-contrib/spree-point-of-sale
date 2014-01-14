@@ -254,6 +254,31 @@ describe Spree::Admin::PosController do
         end          
       end
     end
+
+    describe 'ensure existing user' do
+      def send_request(params = {})
+        post :associate_user, params.merge!({:use_route => 'spree'})
+      end
+
+      context 'to be associated old user does not exist' do
+        before do
+          send_request(:number => order.number, :email => 'non-exist@website.com')
+        end
+
+        it { response.should redirect_to(admin_pos_show_order_path) }
+        it { flash[:error].should eq("No user with email non-exist@website.com") }
+      end
+
+      context 'to be added a new user already exists' do
+        before do
+          @existing_user = Spree::User.create!(:email => 'existing@website.com', :password => 'iexist')
+          send_request(:number => order.number, :new_email => @existing_user.email)
+        end
+
+        it { response.should redirect_to(admin_pos_show_order_path) }
+        it { flash[:error].should eq("User Already exists for the email #{@existing_user.email}") }
+      end
+    end
   end
 
   context 'actions' do

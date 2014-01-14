@@ -7,4 +7,11 @@ Spree::Shipment.class_eval do
     touch :delivered_at
   end
 
+  def self.create_shipment_for_pos_order(order)
+    shipment = new
+    shipment.order = order
+    shipment.stock_location = Spree::StockLocation.stores.active.first
+    shipment.shipping_methods << Spree::ShippingMethod.where(:name => SpreePos::Config[:pos_shipping]).first
+    shipment.save!
+  end
 end
