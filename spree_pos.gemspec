@@ -17,8 +17,8 @@ Gem::Specification.new do |s|
   s.summary = "Point of sale screen for Spree"
   s.description = "Extend functionality for spree to give shop like ordering ability through admin end"
 
-  s.add_runtime_dependency(%q<spree_core>, ["~> 2.0.0"])
-  s.add_runtime_dependency(%q<spree_backend>, ["~> 2.0.0"])
+  # s.add_runtime_dependency(%q<spree_core>, ["~> 2.0.0"])
+  # s.add_runtime_dependency(%q<spree_backend>, ["~> 2.0.0"])
   s.add_dependency('spree_html_invoice', [">=0"])
   s.add_dependency(%q<barby>, [">= 0"])
   s.add_dependency(%q<prawn>, [">= 0"])
