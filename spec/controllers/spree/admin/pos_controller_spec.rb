@@ -269,7 +269,7 @@ describe Spree::Admin::PosController do
 
       context 'to be added a new user already exists' do
         before do
-          @existing_user = Spree::User.create!(:email => 'existing@website.com')
+          @existing_user = Spree::User.create!(:email => 'existing@website.com', :password => 'iexist')
           send_request(:number => order.number, :new_email => @existing_user.email)
         end
 

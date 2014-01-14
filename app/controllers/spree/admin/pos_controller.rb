@@ -1,14 +1,12 @@
 class Spree::Admin::PosController < Spree::Admin::BaseController
-  before_filter :load_order, :except => [:new]
-  before_filter :ensure_pos_order, :except => [:new]
-  before_filter :ensure_unpaid_order, :except => [:new]
-
+  before_filter :load_order, :ensure_pos_order, :ensure_unpaid_order, :except => [:new]
   helper_method :user_stock_locations
   before_filter :load_variant, :only => [:add, :remove]
   before_filter :ensure_pos_shipping_method, :only => [:new]
   before_filter :ensure_payment_method, :only => [:update_payment]
   before_filter :ensure_existing_user, :only => [:associate_user]
   before_filter :check_unpaid_pos_order, :only => :new
+  before_filter :check_discount_request, :only => :apply_discount
   before_filter :load_line_item, :only => [:update_line_item_quantity, :apply_discount]
 
   def new
@@ -48,13 +46,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def apply_discount
-    discount = params[:discount].try(:to_f)
-    if VALID_DISCOUNT_REGEX.match(params[:discount]) && discount < 100
-      @item.price = @item.variant.price * ( 1.0 - discount/100.0 )
-      @item.save
-    else
-      flash[:notice] = 'Please enter a valid discount'
-    end
+    @item.price = @item.variant.price * ( 1.0 - @discount/100.0 )
+    @item.save
     redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
@@ -96,6 +89,11 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   private 
   
+  def check_discount_request
+    @discount = params[:discount].try(:to_f)
+    redirect_to admin_pos_show_order_path(:number => @order.number), :flash => { :error => 'Please enter a valid discount' } unless VALID_DISCOUNT_REGEX.match(params[:discount]) || @discount >= 100
+  end
+
   def ensure_pos_order
     unless @order.is_pos?
       flash[:error] = 'This is not a pos order'
