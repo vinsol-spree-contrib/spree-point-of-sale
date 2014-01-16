@@ -1,7 +1,7 @@
 $( document ).ready(function() {
   $('#sku').focus();
-  $( ".tabbing" ).tabs();
-  $("#update_payment input[name='payment_id']:first").click();
+  $( "#pos-tabs" ).tabs();
+  $("#update_payment input[name='payment_method_id']:first").click();
 
   $( "#associate_user_toggle" ).click(function() {
     $( "#associate_user" ).slideToggle( "slow", function() {
@@ -16,4 +16,5 @@ $( document ).ready(function() {
   $('#update_payment input[type=radio][data-name ~= card],#update_payment input[type=radio][data-name ~= Card]').click(function() {
     $('#card_name_options').show();
   });
+  $( "#associate_user" ).toggle();
 });

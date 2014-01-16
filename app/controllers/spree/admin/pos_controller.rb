@@ -8,6 +8,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   before_filter :check_unpaid_pos_order, :only => :new
   before_filter :check_discount_request, :only => :apply_discount
   before_filter :load_line_item, :only => [:update_line_item_quantity, :apply_discount]
+  before_filter :clean_and_reload_order, :only => [:update_stock_location]
 
   def new
     init_pos
@@ -18,7 +19,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     init_search
 
     #using the scope available_at_stock_location which should be defined according to app or removed if not required
-    stock_location = user_stock_locations(spree_current_user).first
+    stock_location = @order.shipment.stock_location
     @search = Spree::Variant.includes([:product]).available_at_stock_location(stock_location.id).ransack(params[:q])
     @variants = @search.result(:distinct => true).page(params[:page]).per(PRODUCTS_PER_SEARCH_PAGE)
   end
@@ -88,6 +89,11 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   private 
+  
+  def clean_and_reload_order
+    @order.clean!
+    load_order
+  end
   
   def check_discount_request
     @discount = params[:discount].try(:to_f)

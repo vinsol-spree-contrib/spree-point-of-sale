@@ -1,0 +1,25 @@
+#pos-tabs { border:none; padding:20px 0px; float:left; width:100%; }
+#pos-tabs .ui-tabs-nav { display:inline-block; width:100%;  border:none; background:none; border-radius:3px; background:#5498DA;}
+#pos-tabs .ui-tabs-nav .ui-state-default { float:left; width:50%; text-align:center; border:none; background:none;}
+#pos-tabs .ui-tabs-nav .ui-state-default .ui-tabs-anchor { display:block; padding:10px; font-weight:normal; text-transform:uppercase; font-size:11px;  color:#fff !important; position:relative;}
+#pos-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor { background:#9FC820; border-radius:3px;}
+#pos-tabs .ui-tabs-nav .ui-state-active .ui-tabs-anchor:after {
+  content: '';
+  position: absolute;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 5px solid #9fc820;
+  bottom: 0px;
+  margin-bottom: -5px;
+  left: 50%;
+  margin-left: -10px;
+  z-index: 1;
+  }
+#pos-tabs .commonfieldset .row { margin:0;}
+#pos-tabs .commonfieldset  p { padding-bottom:10px;}
+#pos-tabs .ui-widget-content { border:none; }
+table#pos-order-table th { border-top: 1px solid #cee1f4;}
+table#pos-order-table { padding-top: 10px;}
+table#pos-order-table td.discount input.submit{ margin: 2px 0 0 10px;}
+fieldset.no-bottom-margin { margin-bottom: 0px;}
+a#create_pos_order { float:right; padding:4px 9px;}

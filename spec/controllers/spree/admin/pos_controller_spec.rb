@@ -400,7 +400,7 @@ describe Spree::Admin::PosController do
       end          
     end
 
-    describe ' apply discount' do
+    describe 'apply discount' do
       def send_request(params = {})
         post :apply_discount, params.merge!({:use_route => 'spree'})
       end
@@ -434,7 +434,9 @@ describe Spree::Admin::PosController do
         Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
         @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @stock_location = mock_model(Spree::StockLocation)
-        controller.stub(:user_stock_locations).with(user).and_return([@stock_location])
+        @shipment = mock_model(Spree::Shipment)
+        order.stub(:shipment).and_return(@shipment)
+        @shipment.stub(:stock_location).and_return(@stock_location)
         @variants = [variant]
         @variants.stub(:result).with(:distinct => true).and_return(@variants)
         @variants.stub(:page).with('1').and_return(@variants)
@@ -448,7 +450,8 @@ describe Spree::Admin::PosController do
       it { controller.should_receive(:ensure_unpaid_order).and_return(true) }      
       it { controller.should_not_receive(:ensure_pos_shipping_method) }
       it { controller.should_not_receive(:ensure_payment_method) }
-      
+      it { order.should_receive(:shipment).and_return(@shipment) }
+      it { @shipment.should_receive(:stock_location).and_return(@stock_location) }
       it { Spree::Variant.should_receive(:ransack).with({"product_name_cont"=>"test-product", "meta_sort"=>"product_name asc", "deleted_at_null"=>"1", "product_deleted_at_null"=>"1", "published_at_not_null"=>"1"}).and_return(@variants) }    
       it { @variants.should_receive(:result).with(:distinct => true).and_return(@variants) }
       it { @variants.should_receive(:page).with('1').and_return(@variants) }
@@ -764,6 +767,8 @@ describe Spree::Admin::PosController do
 
       before do
         @orders = [order]
+        order.stub(:clean!).and_return(true)
+        order.stub(:assign_shipment_for_pos).and_return(true)
         Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
         @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @stock_location = mock_model(Spree::StockLocation)
@@ -784,6 +789,8 @@ describe Spree::Admin::PosController do
       end
 
       describe 'updates order addresses and update shipment' do
+        it { order.should_receive(:clean!).and_return(true) }
+        it { controller.should_receive(:load_order).twice.and_return(true) }
         it { @stock_location.should_receive(:address).and_return(address) }
         it { order.should_receive(:ship_address=).with(address).and_return(address) }
         it { order.should_receive(:bill_address=).with(address).and_return(address) }

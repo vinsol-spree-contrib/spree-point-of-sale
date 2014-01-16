@@ -1,8 +1,5 @@
-<% content_for :head do -%>
-  <%= javascript_include_tag 'admin/spree_pos' %>
-<% end %>
 <% content_for :sidebar do %>
-  <% if user_stock_locations(spree_current_user).count > 1 %>
+  <% if user_stock_locations(spree_current_user).count > 0 %>
 
   <div class="stock_locations">
     <fieldset>
@@ -33,7 +30,7 @@
 <%end%>
 
 <h5>Order No: <%= @order.number %>
-  <a href="/admin/pos/new" onClick="javascript:if (newwindow) newwindow.close()" class="create_order button"> 
+  <a href="/admin/pos/new" onClick="javascript:if (newwindow) newwindow.close()" id="create_pos_order" class="button"> 
     Create New Order
   </a>
 </h5>
@@ -46,7 +43,7 @@
   </a>
 </div>
 <%= form_tag "/admin/pos/associate_user/#{@order.number}", :id => "associate_user" do %>
-<div class="tabbing">
+<div id="pos-tabs">
   <ul>
     <li><a href="#associate_email">Search User by email</a></li>
     <li><a href="#associate_new_user">Add a new user</a></li>
@@ -59,10 +56,6 @@
           <%= text_field_tag :email, '', :size => 25 %> <br/>
         </div>
       </div>
-      <div class="four columns alpha">
-        <div class="field">&nbsp;&nbsp;&nbsp;<br>
-          <%= button "Associate User" %> </div>
-      </div>
     </div>
   </div>
   <!-- <div class="or_separator"><span>OR</span></div> -->
@@ -70,15 +63,19 @@
     <div class="row">
       <div class="four columns alpha">
         <div class="field">
-          <label>Email</label>
-          <%= text_field_tag :new_email %> <br/>
+          <label>New Email</label>
+          <%= text_field_tag :new_email, nil, :size => 25 %> <br/>
         </div>
       </div>
     </div>
   </div>
+  <div class="four columns alpha">
+    <div class="field">
+      <%= button "Associate User" %> </div>
+  </div>
 </div>
 <% end %>
-<table class="index">
+<table id='pos-order-table' class="index">
   <tr>
     <th><%= Spree.t('item_description') %></th>
     <th><%= Spree.t('quantity') %></th>
@@ -102,7 +99,7 @@
       <% end %>
       </big></td>
     <td align="center"><%= link_to image_tag("admin/pos/del_16.png") , "/admin/pos/remove/#{@order.number}/#{item.variant.id}"  %> <%= link_to image_tag("admin/pos/plus_16.png") , "/admin/pos/add/#{@order.number}/#{item.variant.id}"    %></td>
-    <td><big> <%= form_tag("/admin/pos/apply_discount/#{@order.number}") do %> <%= hidden_field_tag(:line_item_id, item.id) %> <%= text_field_tag("discount") %> <%= submit_tag 'update' %>
+    <td class='discount'><big> <%= form_tag("/admin/pos/apply_discount/#{@order.number}") do %> <%= hidden_field_tag(:line_item_id, item.id) %> <%= text_field_tag("discount") %> <%= submit_tag 'update', :class => 'submit' %>
       <%end%>
       </big></td>
   </tr>
