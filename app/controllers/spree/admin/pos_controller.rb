@@ -9,7 +9,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   before_filter :check_discount_request, :only => :apply_discount
   before_filter :load_line_item, :only => [:update_line_item_quantity, :apply_discount]
   before_filter :clean_and_reload_order, :only => [:update_stock_location]
-
+  
   def new
     init_pos
     redirect_to admin_pos_show_order_path(:number => @order.number)
@@ -33,6 +33,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def remove
     line_item = @order.contents.remove(@variant, 1, @order.shipment)
+    @order.assign_shipment_for_pos if @order.reload.shipments.blank?
     flash.notice = line_item.quantity.zero? ? Spree.t('product_removed') : 'Quantity Updated' 
     redirect_to admin_pos_show_order_path(:number => @order.number)
   end
@@ -82,19 +83,21 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def update_stock_location
     @order.shipment.stock_location = user_stock_locations(spree_current_user).where(:id => params[:stock_location_id]).first
-    @order.bill_address = @order.ship_address = @order.shipment.stock_location.address
-    @order.save
-    @order.shipment.save
+    if @order.shipment.save
+      flash[:notice] = "Updated Successfully"
+    else
+      flash[:error] = @order.shipment.errors.full_messages.to_sentence
+    end
     redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
   private 
-  
+
   def clean_and_reload_order
     @order.clean!
     load_order
   end
-  
+
   def check_discount_request
     @discount = params[:discount].try(:to_f)
     redirect_to admin_pos_show_order_path(:number => @order.number), :flash => { :error => 'Please enter a valid discount' } unless VALID_DISCOUNT_REGEX.match(params[:discount]) || @discount >= 100
@@ -166,7 +169,6 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def init_pos
     @order = Spree::Order.new(:state => "complete", :is_pos => true, :completed_at => Time.current, :payment_state => 'balance_due')
     @order.associate_user!(spree_current_user)
-    @order.bill_address = @order.ship_address = Spree::StockLocation.active.stores.first.address
     @order.save!
     @order.assign_shipment_for_pos
     @order.save!
