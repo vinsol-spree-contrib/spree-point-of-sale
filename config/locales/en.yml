@@ -1,4 +1,9 @@
 en:
+  order_number: Order Number
+  item_description: Item Description
+  qty: Quantity
+  total: Total
+  order_total: Order Total
   spree:
     pos: POS
     product_added: Product added
