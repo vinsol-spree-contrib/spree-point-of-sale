@@ -4,7 +4,7 @@
   <div class="stock_locations">
     <fieldset>
       <legend>Change Stock Location</legend>
-      <%= form_tag "/admin/pos/update_stock_location/#{@order.number}", :remote => true, :method => :put, :class => 'modify_stock_location_form' do %>
+      <%= form_tag "/admin/pos/update_stock_location/#{@order.number}", :class => 'modify_stock_location_form' do %>
       <% user_stock_locations(spree_current_user).all.each do |stock_location| %>
       <%= radio_button_tag :stock_location_id, stock_location.id, (stock_location.id == @order.shipment.stock_location.id), :id => "stock_location_#{ stock_location.id }", :class => 'stock_location_checkbox' %><%= stock_location.name %><br />
       <% end %>
