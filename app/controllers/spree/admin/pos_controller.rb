@@ -18,7 +18,6 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def find
     init_search
 
-    #using the scope available_at_stock_location which should be defined according to app or removed if not required
     stock_location = @order.shipment.stock_location
     @search = Spree::Variant.includes([:product]).available_at_stock_location(stock_location.id).ransack(params[:q])
     @variants = @search.result(:distinct => true).page(params[:page]).per(PRODUCTS_PER_SEARCH_PAGE)
@@ -181,9 +180,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def add_variant var , quant = 1
-    # init_pos unless @order 
     line_item = @order.contents.add(var, quant, nil, @order.shipment)
-    #TODO Hack to get the inventory to update. There must be a better way, but i'm lost in spree jungle
     var.product.save
     line_item
   end

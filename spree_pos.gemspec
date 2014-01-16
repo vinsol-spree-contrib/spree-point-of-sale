@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.name = "spree_pos"
   s.version = "1.1"
 
-  s.authors = ["Torsten R, Manish Kangia"]
+  s.authors = ["Torsten R, Nishant Tuteja, Manish Kangia"]
 
   s.date = "2013-07-29"
 
