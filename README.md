@@ -13,7 +13,9 @@ Dependencies
 By default POS relies on html-invoice to print a receipt. You can configure this away by setting :pos_printing to the url where you want to redirect after print. 
 
 2)barby
+
 3)prawn
+
 4)chunky_png
 
 
@@ -30,6 +32,7 @@ To your Gemfile add:
 and run bundler.
 
 Finally for migrations, css and javascript do
+
   bundle exec rails g spree_pos:install
 
 
