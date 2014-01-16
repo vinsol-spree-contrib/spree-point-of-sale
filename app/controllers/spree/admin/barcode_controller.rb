@@ -1,5 +1,10 @@
 require 'barby'
+require 'prawn'
+require 'prawn/measurement_extensions'
 require 'barby/barcode/code_128'
+require 'barby/barcode/ean_13'
+require 'barby/outputter/png_outputter'
+
 class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   include Admin::BarcodeHelper
   
