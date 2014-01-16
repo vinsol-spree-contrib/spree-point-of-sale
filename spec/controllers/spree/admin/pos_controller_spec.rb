@@ -11,6 +11,7 @@ describe Spree::Admin::PosController do
   let(:roles) { [role] }
   let(:address) { mock_model(Spree::Address) }
   let(:line_item_error_object) { ActiveModel::Errors.new(Spree::LineItem) }
+  let(:shipment_error_object) { ActiveModel::Errors.new(Spree::Shipment) }
   
   before do
     controller.stub(:spree_current_user).and_return(user)
@@ -25,6 +26,7 @@ describe Spree::Admin::PosController do
     product.stub(:save).and_return(true)
     order.stub(:is_pos?).and_return(true)
     order.stub(:paid?).and_return(false)
+    order.stub(:reload).and_return(order)
   end
 
   context 'before filters' do
@@ -340,8 +342,6 @@ describe Spree::Admin::PosController do
           it { @new_order.should_receive(:assign_shipment_for_pos).and_return(true) }
           it { @new_order.should_receive(:associate_user!).and_return(true) }
           it { @new_order.should_receive(:save!).twice.and_return(true) }
-          it { @new_order.should_receive(:bill_address=).with(address).and_return(address) }
-          it { @new_order.should_receive(:ship_address=).with(address).and_return(address) }
           after { send_request }
         end
 
@@ -560,6 +560,8 @@ describe Spree::Admin::PosController do
         @order_contents = double(Spree::OrderContents)
         @shipment = mock_model(Spree::Shipment)
         order.stub(:shipment).and_return(@shipment)
+        order.stub(:shipments).and_return([@shipment])
+        order.stub(:assign_shipment_for_pos).and_return(true)
         order.stub(:contents).and_return(@order_contents)
         @order_contents.stub(:remove).with(variant, 1, @shipment).and_return(line_item)
         line_item.stub(:quantity).and_return(1)
@@ -593,6 +595,22 @@ describe Spree::Admin::PosController do
         it 'sets flash message' do
           send_request(:number => order.number, :item => variant.id)
           flash[:notice].should eq('Quantity Updated')
+        end
+      end
+
+      context 'shipment is destroyed on empty order' do
+        it 'assigns shipment' do
+          order.should_not_receive(:assign_shipment_for_pos)
+          send_request(:number => order.number, :item => variant.id)
+        end
+      end
+
+      context 'shipment exists after remove' do
+        before { order.stub(:shipments).and_return([]) }
+
+        it 'assigns shipment' do
+          order.should_receive(:assign_shipment_for_pos).and_return(true)
+          send_request(:number => order.number, :item => variant.id)
         end
       end
 
@@ -791,20 +809,35 @@ describe Spree::Admin::PosController do
       describe 'updates order addresses and update shipment' do
         it { order.should_receive(:clean!).and_return(true) }
         it { controller.should_receive(:load_order).twice.and_return(true) }
-        it { @stock_location.should_receive(:address).and_return(address) }
-        it { order.should_receive(:ship_address=).with(address).and_return(address) }
-        it { order.should_receive(:bill_address=).with(address).and_return(address) }
         it { @shipment.should_receive(:stock_location=).with(@stock_location).and_return(@stock_location) }
-        it { @shipment.should_receive(:stock_location).and_return(@stock_location) }
         it { order.should_receive(:shipment).and_return(@shipment) }
-        it { order.should_receive(:save).and_return(true) }
         it { @shipment.should_receive(:save).and_return(true) }
-        it { order.should_receive(:save).and_return(true) }
         it { controller.should_not_receive(:ensure_pos_shipping_method) }
         it { controller.should_not_receive(:ensure_payment_method) }
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
+
         after { send_request(:number => order.number, :stock_location_id => @stock_location.id) }
+      end
+
+      context 'shipment saved successfully' do
+        it 'sets notice' do
+          send_request(:number => order.number, :stock_location_id => @stock_location.id)
+          flash[:notice].should eq('Updated Successfully')
+        end
+      end
+
+      context 'shipment not saved successfully' do
+        before do
+          shipment_error_object.messages.merge!({:base => ["Error Message"]})
+          @shipment.stub(:errors).and_return(shipment_error_object)
+          @shipment.stub(:save).and_return(false)
+        end
+
+        it 'sets error' do
+          send_request(:number => order.number, :stock_location_id => @stock_location.id)
+          flash[:error].should eq('Error Message')
+        end
       end
 
       it 'redirects to action show' do

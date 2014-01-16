@@ -59,4 +59,114 @@ describe Spree::Shipment do
       it { order.shipments.first.stock_location.should eq(store) }
     end
   end
+
+  describe 'validate empty inventory' do
+    before do
+      @order = Spree::Order.create!
+      @shipment = @order.shipments.create!
+      @shipment.stock_location = store
+      @shipment.save!
+      @inventory_unit = @shipment.inventory_units.create!
+    end
+
+    context 'not a pos order' do
+      it 'no error on shipment' do
+        @shipment.reload
+        @shipment.save
+        @shipment.errors.should be_blank
+      end
+    end
+
+    context 'pos order' do
+      before { @order.update_column(:is_pos, true) }
+
+      context 'stock location present and not changed' do
+        before do
+          @shipment.reload
+          @shipment.stock_location = store
+          @shipment.save
+        end
+
+        it { @shipment.errors[:base].should be_blank }
+      end
+
+      context 'stock location present and changed' do
+        before do
+          @shipment.stock_location = nil
+          @shipment.save!
+          @shipment.reload
+          @shipment.stock_location = store
+          @shipment.save
+        end
+
+        it { @shipment.errors[:base].should eq(["Inventory Units assigned for the order. Please remove them to change stock location"]) }
+      end
+
+      context 'stock_location not present' do
+        before do
+          @shipment.stock_location = nil
+          @shipment.save
+        end
+
+        it { @shipment.errors[:base].should be_blank }
+      end
+    end
+  end
+
+  describe 'udpate_order_addresses_from_stock_location' do
+    before do
+      @order = Spree::Order.create!
+      @shipment = @order.shipments.create!
+      @shipment.stock_location = store
+      @shipment.save!
+    end
+
+    context 'not a pos order' do
+      before { @order.reload }
+
+      it { @order.ship_address.should be_nil }
+      it { @order.bill_address.should be_nil }
+    end
+
+    context 'pos order' do
+      before { @order.update_column(:is_pos, true) }
+
+      context 'stock location present and not changed' do
+        before do
+          @shipment.reload
+          @shipment.stock_location = store
+          @shipment.save!
+          @order.reload
+        end
+
+        it { @order.ship_address.should be_nil }
+        it { @order.bill_address.should be_nil }
+      end
+
+      context 'stock location present and changed' do
+        before do
+          @shipment.stock_location = nil
+          @shipment.save!
+          @shipment.reload
+          @shipment.stock_location = store
+          @shipment.save!
+          @order.reload
+        end
+
+        it { @order.ship_address.should eq(store.address) }
+        it { @order.bill_address.should eq(store.address) }
+      end
+
+      context 'stock_location not present' do
+        before do
+          @shipment.stock_location = nil
+          @shipment.save!
+          @order.reload
+        end
+
+        it { @order.ship_address.should be_nil }
+        it { @order.bill_address.should be_nil }
+      end
+    end
+  end
 end
