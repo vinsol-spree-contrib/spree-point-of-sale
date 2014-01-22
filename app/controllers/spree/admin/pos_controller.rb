@@ -2,7 +2,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   before_filter :load_order, :ensure_pos_order, :ensure_unpaid_order, :except => [:new]
   helper_method :user_stock_locations
   before_filter :load_variant, :only => [:add, :remove]
-  before_filter :ensure_pos_shipping_method, :only => [:new]
+  before_filter :ensure_active_store, :ensure_pos_shipping_method, :only => [:new]
   before_filter :ensure_payment_method, :only => [:update_payment]
   before_filter :ensure_existing_user, :only => [:associate_user]
   before_filter :check_unpaid_pos_order, :only => :new
@@ -135,6 +135,10 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def ensure_pos_shipping_method
     redirect_to '/', :flash => { :error => 'No shipping method available for POS orders. Please assign one.'} and return unless Spree::ShippingMethod.where(:name => SpreePos::Config[:pos_shipping]).first
+  end
+
+  def ensure_active_store
+    redirect_to '/', :flash => { :error => 'No active store present. Please assign one.'} and return if Spree::StockLocation.stores.active.blank?
   end
 
   def load_order

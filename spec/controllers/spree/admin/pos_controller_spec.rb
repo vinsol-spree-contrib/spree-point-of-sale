@@ -106,10 +106,61 @@ describe Spree::Admin::PosController do
       end
     end
 
+    describe 'ensure_active_store' do
+      def send_request(params = {})
+        get :new, params.merge!(:use_route => 'spree')
+      end
+
+      context 'store does not exist' do
+        it 'redirects to root' do
+          send_request
+          response.should redirect_to('/')
+        end
+
+        it 'sets the flash message' do
+          send_request
+          flash[:error].should eq('No active store present. Please assign one.')
+        end
+      end
+
+      context 'store does exist' do
+        before do
+          @shipping_method = mock_model(Spree::ShippingMethod, :name => 'pos-shipping')
+          SpreePos::Config[:pos_shipping] = @shipping_method.name
+          @stock_location = mock_model(Spree::StockLocation)
+          @stock_location.stub(:address).and_return(address)
+          @stock_locations = [@stock_location]
+          @stock_locations.stub(:where).with(:id => @stock_location.id.to_s).and_return(@stock_locations)
+          Spree::StockLocation.stub_chain(:active, :stores).and_return(@stock_locations)
+          Spree::ShippingMethod.stub(:where).with(:name => @shipping_method.name).and_return([@shipping_method])
+        end
+
+        it 'does not redirect to root' do
+          send_request
+          response.should_not redirect_to('/')
+        end
+
+        it 'sets no error message for store' do
+          send_request
+          flash[:error].should eq("You have an unpaid/empty order. Please either complete it or update items in the same order.")
+        end
+
+        it 'renders show page' do
+          send_request
+          response.should redirect_to admin_pos_show_order_path(:number => order.number)
+        end
+      end
+    end
+
     describe 'ensure_pos_shipping_method' do
       before do
         @shipping_method = mock_model(Spree::ShippingMethod, :name => 'pos-shipping')
         SpreePos::Config[:pos_shipping] = @shipping_method.name
+        @stock_location = mock_model(Spree::StockLocation)
+        @stock_location.stub(:address).and_return(address)
+        @stock_locations = [@stock_location]
+        @stock_locations.stub(:where).with(:id => @stock_location.id.to_s).and_return(@stock_locations)
+        Spree::StockLocation.stub_chain(:active, :stores).and_return(@stock_locations)
       end
 
       def send_request(params = {})
@@ -299,6 +350,11 @@ describe Spree::Admin::PosController do
         @new_order.stub(:assign_shipment_for_pos).and_return(true)
         @new_order.stub(:associate_user!).and_return(true)
         @new_order.stub(:save!).and_return(true)
+        @stock_location = mock_model(Spree::StockLocation)
+        @stock_location.stub(:address).and_return(address)
+        @stock_locations = [@stock_location]
+        @stock_locations.stub(:where).with(:id => @stock_location.id.to_s).and_return(@stock_locations)
+        Spree::StockLocation.stub_chain(:active, :stores).and_return(@stock_locations)
       end
 
       def send_request(params = {})
