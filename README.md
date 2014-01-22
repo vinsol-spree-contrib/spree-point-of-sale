@@ -8,44 +8,53 @@ Apply discount on items, associate the order to customer email and save the deta
 
 Dependencies
 ============
-1)spree_html_invoice(optional)
+1) spree_html_invoice (optional)
 
 By default POS relies on html-invoice to print a receipt. You can configure this away by setting :pos_printing to the url where you want to redirect after print. 
 
-2)barby
+2) barby
 
-3)prawn
+3) prawn
 
-4)chunky_png
+4) chunky_png
 
 
 SET UP
 =======
 To your Gemfile add:
 
-  1) gem "spree_pos", :git => "git://github.com/vinsol/spree-point-of-sale.git"
+Add spree-point-of-sale to your Gemfile:
 
-  2) If you DONT change the :pos_printing config as described above, you must also add 
+```ruby
+  gem "spree-point-of-sale", require: 'spree_pos'
+```
+  
+If you DONT change the :pos_printing config as described above, you must also add 
 
+```ruby
   gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
+```
 
-and run bundler.
+```ruby
+bundle install
+```
 
 Finally for migrations, css and javascript do
 
-  bundle exec rails g spree_pos:install
-
+```ruby
+bundle exec rails g spree_pos:install
+```
 
 Configure
 =========
 You must configure:
 
-1)ShippingMethod : Create a shipping method for pos and set it from the admin end via general settings. 
+1) ShippingMethod : Create a shipping method for pos and set it from the admin end via general settings. 
 Usually something like "pickup" with cost 0.
 
-2)Payment Methods : They can be added under PointOfSale payment method from admin end itself.
+2) Payment Methods : They can be added under PointOfSale payment method from admin end itself.
 
-3)Store : Make sure atleast one of your stock locations is marked as store.
+3) Store : Make sure atleast one of your stock locations is marked as store.
 
 
 Order
@@ -69,3 +78,5 @@ Barcode printing and SKU
 Barcode printing relies on sku to be provided for variants.
 
 There are links provided to print barcodes for individual variants in the variants index for a product or barcodes for all variants can be printed from the product listings as well.
+
+Copyright (c) 2014 Vinsol, released under the New MIT License
