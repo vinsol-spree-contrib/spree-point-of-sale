@@ -1,7 +1,7 @@
 module SpreePos
 
   class Engine < Rails::Engine
-    engine_name 'spree-point-of-sale'
+    engine_name 'spree_pos'
 
     config.autoload_paths += %W(#{config.root}/lib)
 
