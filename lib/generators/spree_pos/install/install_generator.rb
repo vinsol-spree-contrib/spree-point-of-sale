@@ -11,7 +11,7 @@ module SpreePos
       end
 
       def add_migrations
-        run 'bundle exec rake railties:install:migrations FROM=spree-point-of-sale'
+        run 'bundle exec rake railties:install:migrations FROM=spree_pos'
       end
 
       def run_migrations
