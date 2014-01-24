@@ -31,6 +31,8 @@ describe Spree::Admin::PosController do
 
   context 'before filters' do
     before do
+      controller.stub(:ensure_pos_shipping_method).and_return(true)
+      controller.stub(:ensure_active_store).and_return(true)
       @orders = [order]
       Spree::Order.stub(:by_number).with(order.number).and_return(@orders)
       @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
@@ -107,6 +109,7 @@ describe Spree::Admin::PosController do
     end
 
     describe 'ensure_active_store' do
+      before { controller.unstub(:ensure_active_store) }
       def send_request(params = {})
         get :new, params.merge!(:use_route => 'spree')
       end
@@ -154,6 +157,7 @@ describe Spree::Admin::PosController do
 
     describe 'ensure_pos_shipping_method' do
       before do
+        controller.unstub(:ensure_pos_shipping_method)
         @shipping_method = mock_model(Spree::ShippingMethod, :name => 'pos-shipping')
         SpreePos::Config[:pos_shipping] = @shipping_method.name
         @stock_location = mock_model(Spree::StockLocation)
@@ -335,7 +339,7 @@ describe Spree::Admin::PosController do
   context 'actions' do
     before do
       controller.stub(:ensure_pos_shipping_method).and_return(true)
-      controller.stub(:ensure_payment_method).and_return(true)
+      controller.stub(:ensure_active_store).and_return(true)
       Spree::StockLocation.stub_chain(:active,:stores,:first,:address).and_return(address)
       controller.instance_variable_set(:@order,order)
       controller.stub(:check_valid_order).and_return(true)
@@ -362,6 +366,7 @@ describe Spree::Admin::PosController do
       end
 
       context 'before filters' do
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
         it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         it { controller.should_not_receive(:check_valid_order) }
@@ -428,7 +433,8 @@ describe Spree::Admin::PosController do
       context 'update_line_item_quantity' do
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         it { order.should_receive(:line_items).and_return(@line_items) }
         it { line_item.should_receive(:quantity=).with('2').and_return(true) }
@@ -473,6 +479,12 @@ describe Spree::Admin::PosController do
         line_item.stub(:price=).with(18.0).and_return(true)
       end
 
+      it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
+      it { controller.should_receive(:ensure_pos_order).and_return(true) }
+      it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+      it { controller.should_receive(:ensure_active_store).and_return(true) }
+      it { controller.should_not_receive(:ensure_payment_method) }
+
       it { order.should_receive(:line_items).and_return(@line_items) }
       it { line_item.should_receive(:variant).and_return(variant) }
       it { line_item.should_receive(:save).and_return(true) }
@@ -504,7 +516,8 @@ describe Spree::Admin::PosController do
       
       it { controller.should_receive(:ensure_pos_order).and_return(true) }      
       it { controller.should_receive(:ensure_unpaid_order).and_return(true) }      
-      it { controller.should_not_receive(:ensure_pos_shipping_method) }
+      it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+      it { controller.should_receive(:ensure_active_store).and_return(true) }
       it { controller.should_not_receive(:ensure_payment_method) }
       it { order.should_receive(:shipment).and_return(@shipment) }
       it { @shipment.should_receive(:stock_location).and_return(@stock_location) }
@@ -562,7 +575,8 @@ describe Spree::Admin::PosController do
       describe 'adds to order' do
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         
         it { order.should_receive(:contents).and_return(@order_contents) }
@@ -630,7 +644,8 @@ describe Spree::Admin::PosController do
       describe 'removes from order' do
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         
         it { order.should_receive(:contents).and_return(@order_contents) }
@@ -691,7 +706,8 @@ describe Spree::Admin::PosController do
       context 'before filters' do
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         after { send_request({:number => order.number}) }
       end
@@ -728,7 +744,8 @@ describe Spree::Admin::PosController do
       context 'before filters' do
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         after { send_request(:number => order.number, :new_email =>'test-user@pos.com') }
       end
@@ -790,7 +807,8 @@ describe Spree::Admin::PosController do
       end
 
       context 'before filters' do
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
         it { controller.should_receive(:ensure_payment_method).and_return(true) }
         it { controller.should_receive(:ensure_pos_order).and_return(true) }
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
@@ -868,7 +886,8 @@ describe Spree::Admin::PosController do
         it { @shipment.should_receive(:stock_location=).with(@stock_location).and_return(@stock_location) }
         it { order.should_receive(:shipment).and_return(@shipment) }
         it { @shipment.should_receive(:save).and_return(true) }
-        it { controller.should_not_receive(:ensure_pos_shipping_method) }
+        it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
+        it { controller.should_receive(:ensure_active_store).and_return(true) }
         it { controller.should_not_receive(:ensure_payment_method) }
         it { controller.should_receive(:ensure_unpaid_order).and_return(true) }
         it { controller.should_receive(:ensure_pos_order).and_return(true) }

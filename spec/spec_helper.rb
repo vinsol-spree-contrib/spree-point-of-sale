@@ -6,7 +6,7 @@ require 'rspec/rails'
 
 require 'rubygems'
 require 'bundler/setup'
-require 'spree_pos'
+require 'spree-point-of-sale'
 require 'database_cleaner'
 
 # Requires supporting ruby files with custom matchers and macros, etc,

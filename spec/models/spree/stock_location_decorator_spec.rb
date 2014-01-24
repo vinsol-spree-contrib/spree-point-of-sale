@@ -40,4 +40,17 @@ describe Spree::StockLocation do
       it { @invalid_store.errors[:address].should eq(['is invalid']) }
     end
   end
+
+  describe '#can_supply?' do
+    before do
+      @product = Spree::Product.create!(:name => 'test-product', :price => 10)
+      @variant = @product.master
+      @stock_item = store.stock_items.where(:variant_id => @variant.id).first
+      @stock_item.update_column(:count_on_hand, 2)
+    end
+
+    it { store.can_supply?(1,@variant).should be_true }
+    it { store.can_supply?(2,@variant).should be_true }
+    it { store.can_supply?(3,@variant).should be_false }
+  end
 end
