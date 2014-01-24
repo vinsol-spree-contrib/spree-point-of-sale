@@ -2,7 +2,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   before_filter :load_order, :ensure_pos_order, :ensure_unpaid_order, :except => [:new]
   helper_method :user_stock_locations
   before_filter :load_variant, :only => [:add, :remove]
-  before_filter :ensure_active_store, :ensure_pos_shipping_method, :only => [:new]
+  before_filter :ensure_active_store, :ensure_pos_shipping_method
   before_filter :ensure_payment_method, :only => [:update_payment]
   before_filter :ensure_existing_user, :only => [:associate_user]
   before_filter :check_unpaid_pos_order, :only => :new
@@ -49,6 +49,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def apply_discount
     @item.price = @item.variant.price * ( 1.0 - @discount/100.0 )
     @item.save
+    flash[:error] = @item.errors.full_messages.to_sentence if @item.errors.present?
     redirect_to admin_pos_show_order_path(:number => @order.number)
   end
 
