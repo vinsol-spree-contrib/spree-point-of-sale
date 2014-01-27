@@ -1,5 +1,5 @@
-SpreePos
-===============
+Spree Pos [![Code Climate](https://codeclimate.com/github/vinsol/spree-point-of-sale.png)](https://codeclimate.com/github/vinsol/spree-point-of-sale)
+=========
 SpreePos hooks into the Admin Tab and is meant to be used to sell at a shop.
 
 Allows you to search and add items available at the selected stock location. 
@@ -26,13 +26,13 @@ To your Gemfile add:
 Add spree-point-of-sale to your Gemfile:
 
 ```ruby
-  gem "spree-point-of-sale", require: 'spree_pos'
+gem "spree-point-of-sale", require: 'spree_pos'
 ```
   
 If you DONT change the :pos_printing config as described above, you must also add 
 
 ```ruby
-  gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
+gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
 ```
 
 ```ruby
