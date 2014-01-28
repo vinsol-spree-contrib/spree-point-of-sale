@@ -3,13 +3,13 @@ require 'rake/testtask'
 require 'rake/packagetask'
 require 'rubygems/package_task'
 require 'rspec/core/rake_task'
-require 'spree_core/testing_support/common_rake'
+require 'spree/testing_support/common_rake'
 
 RSpec::Core::RakeTask.new
 
 task :default => [:spec, :cucumber ]
 
-spec = eval(File.read('spree_pos.gemspec'))
+spec = eval(File.read('spree-point-of-sale.gemspec'))
 
 Gem::PackageTask.new(spec) do |p|
   p.gem_spec = spec
@@ -24,6 +24,7 @@ end
 
 desc "Generates a dummy app for testing"
 task :test_app do
-  ENV['LIB_NAME'] = 'spree_pos'
+  ENV['DB'] = 'mysql'
+  ENV['LIB_NAME'] = 'spree-point-of-sale'
   Rake::Task['common:test_app'].invoke
 end
