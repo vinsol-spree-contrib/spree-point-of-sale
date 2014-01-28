@@ -9,7 +9,8 @@ describe Spree::Stock::PosAvailabilityValidator do
     @order = Spree::Order.create!(:is_pos => true)
     @product = Spree::Product.create!(:name => 'test-product', :price => 10)
     @variant = @product.master
-    @line_item = @order.line_items.build(:variant_id => @variant.id, :price => @product.price, :quantity => 3)
+    @line_item = @order.line_items.build(:variant_id => @variant.id, :quantity => 3)
+    @line_item.price = @product.price
     @shipment = @order.shipments.create!
     @line_item.stub(:order).and_return(@order)
     @order.stub(:shipment).and_return(@shipment)
