@@ -1,4 +1,4 @@
-Spree Pos [![Code Climate](https://codeclimate.com/github/vinsol/spree-point-of-sale.png)](https://codeclimate.com/github/vinsol/spree-point-of-sale) [![Build Status](https://travis-ci.org/vinsol/spree_favorite_products.png?branch=master)](https://travis-ci.org/vinsol/spree_favorite_products)
+Spree Pos [![Code Climate](https://codeclimate.com/github/vinsol/spree-point-of-sale.png)](https://codeclimate.com/github/vinsol/spree-point-of-sale) [![Build Status](https://travis-ci.org/vinsol/spree-point-of-sale.png?branch=master)](https://travis-ci.org/vinsol/spree-point-of-sale)
 =========
 SpreePos hooks into the Admin Tab and is meant to be used to sell at a shop.
 
