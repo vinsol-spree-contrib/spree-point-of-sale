@@ -4,21 +4,22 @@ describe Spree::Stock::PosAvailabilityValidator do
   let(:country) { Spree::Country.create!(:name => 'mk_country', :iso_name => "mk") }
   let(:state) { country.states.create!(:name => 'mk_state') }
   let(:store) { Spree::StockLocation.create!(:name => 'store', :store => true, :address1 => "home", :address2 => "town", :city => "delhi", :zipcode => "110034", :country_id => country.id, :state_id => state.id, :phone => "07777676767") }
-  
+  let(:shipping_category) { Spree::ShippingCategory.create!(:name => 'test-shipping') }
+
   before do
     @order = Spree::Order.create!(:is_pos => true)
-    @product = Spree::Product.create!(:name => 'test-product', :price => 10)
+    @product = Spree::Product.create!(:name => 'test-product', :price => 10, :shipping_category => shipping_category)
     @variant = @product.master
     @line_item = @order.line_items.build(:variant_id => @variant.id, :quantity => 3)
     @line_item.price = @product.price
     @shipment = @order.shipments.create!
     @line_item.stub(:order).and_return(@order)
-    @order.stub(:shipment).and_return(@shipment)
+    @order.stub(:shipments).and_return([@shipment])
   end
 
   describe 'ensures stock location' do
     it 'presence' do
-      @line_item.order.shipment.stock_location.should be_nil
+      @line_item.order.shipments.last.stock_location.should be_nil
       @line_item.save
       @line_item.errors[:stock_location].should eq(['No Active Store Associated'])
     end

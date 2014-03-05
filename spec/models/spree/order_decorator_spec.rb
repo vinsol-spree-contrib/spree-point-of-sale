@@ -6,10 +6,6 @@ describe Spree::Order do
   let(:country) { Spree::Country.create!(:name => 'mk_country', :iso_name => "mk") }
   let(:state) { country.states.create!(:name => 'mk_state') }
   let(:store) { Spree::StockLocation.create!(:name => 'store', :store => true, :address1 => "home", :address2 => "town", :city => "delhi", :zipcode => "110034", :country_id => country.id, :state_id => state.id, :phone => "07777676767") }
- 
-  [:state, :is_pos, :completed_at, :payment_state].each do |attribute|
-    it { should allow_mass_assignment_of attribute }
-  end
 
   before do
     @order = Spree::Order.create!(:is_pos => true)

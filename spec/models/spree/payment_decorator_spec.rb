@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Spree::Payment do
-  it { should allow_mass_assignment_of :card_name }
-
   let(:payment_method) { Spree::PaymentMethod.create!(:name => 'test-method') }
   let(:card_payment_method) { Spree::PaymentMethod.create!(:name => 'card-payment')}
   let(:order) { Spree::Order.create! }
