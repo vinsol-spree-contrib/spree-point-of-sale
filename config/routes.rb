@@ -1,19 +1,19 @@
 Spree::Core::Engine.routes.draw do
-  match "admin/barcode/print_variants_barcodes/:id" => "barcode#print_variants_barcodes", via: [:get]
-  match "admin/barcode/print/:id" => "barcode#print", via: [:get]
+  get "admin/barcode/print_variants_barcodes/:id", to: "admin/barcode#print_variants_barcodes"
+  get "admin/barcode/print/:id", to: "admin/barcode#print"
 
-  match "admin/pos/new" => "pos#new", via: [:get]
-  match "admin/pos/show/:number" => "pos#show", :as => :admin_pos_show_order, via: [:get]
-  match "admin/pos/clean/:number" => "pos#clean_order", :as => :admin_pos_clean_order, via: [:get]
-  match "admin/pos/find/:number" => "pos#find", via: [:get]
-  match "admin/pos/add/:number/:item" => "pos#add", via: [:get]
-  match "admin/pos/remove/:number/:item" => "pos#remove", via: [:get]
-  match "admin/pos/associate_user/:number" => "pos#associate_user", via: [:get]
-  match "admin/pos/update_payment/:number" => "pos#update_payment", via: [:get]
-  match "admin/pos/update_line_item_quantity/:number" => "pos#update_line_item_quantity", via: [:get]
-  match "admin/pos/apply_discount/:number" => "pos#apply_discount", via: [:get]
+  get "admin/pos/new" , to: "admin/pos#new"
+  get "admin/pos/show/:number" , to: "admin/pos#show", as: :admin_pos_show_order
+  post "admin/pos/clean/:number" , to: "admin/pos#clean_order", as: :admin_pos_clean_order
+  get "admin/pos/find/:number" , to: "admin/pos#find"
+  get "admin/pos/add/:number/:item" , to: "admin/pos#add"
+  get "admin/pos/remove/:number/:item" , to: "admin/pos#remove"
+  post "admin/pos/associate_user/:number" , to: "admin/pos#associate_user"
+  post "admin/pos/update_payment/:number" , to: "admin/pos#update_payment"
+  post "admin/pos/update_line_item_quantity/:number" , to: "admin/pos#update_line_item_quantity" 
+  post "admin/pos/apply_discount/:number" , to: "admin/pos#apply_discount" 
 
-  match "admin/pos/index" => "pos#new", via: [:get]
-  match "admin/pos/update_stock_location/:number" => "pos#update_stock_location", via: [:get]
-get "admin/pos" , :to => "pos#new"
+  get "admin/pos/index" , to: "admin/pos#new"
+  post "admin/pos/update_stock_location/:number" , to: "admin/pos#update_stock_location"
+  get "admin/pos" , to: "admin/pos#new"
 end
