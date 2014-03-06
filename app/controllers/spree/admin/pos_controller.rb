@@ -17,7 +17,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
 
   def find
     init_search
-
+    #TODO -> create one method for last_shipment in order_model as it is used in verious locations.
     stock_location = @order.shipments.last.stock_location
     @search = Spree::Variant.includes([:product]).available_at_stock_location(stock_location.id).ransack(params[:q])
     @variants = @search.result(:distinct => true).page(params[:page]).per(PRODUCTS_PER_SEARCH_PAGE)
