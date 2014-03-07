@@ -503,7 +503,7 @@ describe Spree::Admin::PosController do
         @orders.stub(:includes).with([{ :line_items => [{ :variant => [:default_price, { :product => [:master] } ] }] } , { :adjustments => :adjustable }]).and_return(@orders)
         @stock_location = mock_model(Spree::StockLocation)
         @shipment = mock_model(Spree::Shipment)
-        order.stub(:shipment).and_return(@shipment)
+        order.stub(:shipments).and_return([@shipment])
         @shipment.stub(:stock_location).and_return(@stock_location)
         @variants = [variant]
         @variants.stub(:result).with(:distinct => true).and_return(@variants)
@@ -519,7 +519,7 @@ describe Spree::Admin::PosController do
       it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
       it { controller.should_receive(:ensure_active_store).and_return(true) }
       it { controller.should_not_receive(:ensure_payment_method) }
-      it { order.should_receive(:shipment).and_return(@shipment) }
+      it { order.should_receive(:shipments).and_return([@shipment]) }
       it { @shipment.should_receive(:stock_location).and_return(@stock_location) }
       it { Spree::Variant.should_receive(:ransack).with({"product_name_cont"=>"test-product", "meta_sort"=>"product_name asc", "deleted_at_null"=>"1", "product_deleted_at_null"=>"1", "published_at_not_null"=>"1"}).and_return(@variants) }    
       it { @variants.should_receive(:result).with(:distinct => true).and_return(@variants) }
@@ -563,7 +563,7 @@ describe Spree::Admin::PosController do
         Spree::Variant.stub(:where).with(:id => variant.id.to_s).and_return([variant])
         @order_contents = double(Spree::OrderContents)
         @shipment = mock_model(Spree::Shipment)
-        order.stub(:shipment).and_return(@shipment)
+        order.stub(:shipments).and_return([@shipment])
         order.stub(:contents).and_return(@order_contents)
         @order_contents.stub(:add).with(variant, 1, nil, @shipment).and_return(line_item)
       end
@@ -629,7 +629,6 @@ describe Spree::Admin::PosController do
         Spree::Variant.stub(:where).with(:id => variant.id.to_s).and_return([variant])
         @order_contents = double(Spree::OrderContents)
         @shipment = mock_model(Spree::Shipment)
-        order.stub(:shipment).and_return(@shipment)
         order.stub(:shipments).and_return([@shipment])
         order.stub(:assign_shipment_for_pos).and_return(true)
         order.stub(:contents).and_return(@order_contents)
@@ -669,15 +668,15 @@ describe Spree::Admin::PosController do
         end
       end
 
-      context 'shipment is destroyed on empty order' do
+      context 'shipment is not destroyed on empty order' do
         it 'assigns shipment' do
           order.should_not_receive(:assign_shipment_for_pos)
           send_request(:number => order.number, :item => variant.id)
         end
       end
 
-      context 'shipment exists after remove' do
-        before { order.stub(:shipments).and_return([]) }
+      context 'shipment destroyed after remove' do
+        before { order.stub_chain(:shipments, :blank?).and_return(true) }
 
         it 'assigns shipment' do
           order.should_receive(:assign_shipment_for_pos).and_return(true)
@@ -875,7 +874,7 @@ describe Spree::Admin::PosController do
         @shipment.stub(:stock_location=).with(@stock_location).and_return(@stock_location)
         @shipment.stub(:stock_location).and_return(@stock_location)
 
-        order.stub(:shipment).and_return(@shipment)
+        order.stub(:shipments).and_return([@shipment])
         order.stub(:save).and_return(true)
         @shipment.stub(:save).and_return(true)
       end
@@ -884,7 +883,7 @@ describe Spree::Admin::PosController do
         it { order.should_receive(:clean!).and_return(true) }
         it { controller.should_receive(:load_order).twice.and_return(true) }
         it { @shipment.should_receive(:stock_location=).with(@stock_location).and_return(@stock_location) }
-        it { order.should_receive(:shipment).and_return(@shipment) }
+        it { order.should_receive(:shipments).and_return([@shipment]) }
         it { @shipment.should_receive(:save).and_return(true) }
         it { controller.should_receive(:ensure_pos_shipping_method).and_return(true) }
         it { controller.should_receive(:ensure_active_store).and_return(true) }

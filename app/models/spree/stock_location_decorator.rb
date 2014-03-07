@@ -1,12 +1,12 @@
 module Spree
   StockLocation.class_eval do
-    attr_accessible :store
+    # attr_accessible :store
     belongs_to :address
 
     before_validation :associate_address
 
-    scope :stores, where(:store => true)
-    scope :not_store, where('store != ?', true)
+    scope :stores, -> { where(:store => true) }
+    scope :not_store, -> { where('store != ?', true) }
 
     validates_associated :address
 

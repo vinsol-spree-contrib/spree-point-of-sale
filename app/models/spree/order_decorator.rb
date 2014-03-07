@@ -1,13 +1,13 @@
 Spree::Order.class_eval do
-  attr_accessible :state, :is_pos, :completed_at, :payment_state
+  # attr_accessible :state, :is_pos, :completed_at, :payment_state
 
-  scope :pos, where(:is_pos => true)
-  scope :unpaid, where("payment_state != 'paid'")
+  scope :pos, -> { where(:is_pos => true) }
+  scope :unpaid, -> { where("payment_state != 'paid'") }
   scope :unpaid_pos_order, ->{ pos.unpaid }
 
   def clean!
     payments.delete_all
-    line_items.each { |line_item| contents.remove(line_item.variant, line_item.quantity, shipment) }
+    line_items.each { |line_item| contents.remove(line_item.variant, line_item.quantity, shipments.last) }
     #shipment is removed on removing all items, so initializing a new shipment
     assign_shipment_for_pos
   end

@@ -8,8 +8,8 @@ require 'barby/outputter/png_outputter'
 class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   include Admin::BarcodeHelper
   
-  before_filter :load, :only => [:print]
-  before_filter :load_product_and_variants, :only => [:print_variants_barcodes]
+  before_action :load, :only => [:print]
+  before_action :load_product_and_variants, :only => [:print_variants_barcodes]
   layout :false
   
   def print_variants_barcodes

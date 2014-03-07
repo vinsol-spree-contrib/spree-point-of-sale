@@ -80,6 +80,14 @@ Barcode printing relies on sku to be provided for variants.
 There are links provided to print barcodes for individual variants in the variants index for a product or barcodes for all variants can be printed from the product listings as well.
 
 
+Testing
+---------
+Be sure to bundle your dependencies and then create a dummy test app for the specs to run against.
+```ruby
+bundle
+bundle exec rake test_app
+bundle exec rspec spec
+```
 
 
 Credits
