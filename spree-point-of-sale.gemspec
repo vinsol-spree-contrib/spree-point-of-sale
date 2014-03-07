@@ -3,21 +3,21 @@
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.name = "spree-point-of-sale"
-  s.version = "2.1.0"
+  s.version = "1.0.4"
 
-  s.authors = ["Torsten R, Nishant Tuteja, Manish Kangia"]
+  s.author = ["Torsten R, Nishant Tuteja, Manish Kangia"]
 
 
   s.email     = 'info@vinsol.com'
   s.homepage  = 'http://vinsol.com'  
+  s.license   = 'MIT'
 
   s.files     = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
 
-  s.require_paths = ["lib"]
+  s.require_path = ["lib"]
   s.required_ruby_version = ">= 1.9.3"
 
-  s.requirements = ["none"]
+  s.requirements << ["none"]
   s.rubygems_version = "2.0.3"
 
   s.summary = "Point of sale screen for Spree"
