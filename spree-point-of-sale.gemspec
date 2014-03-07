@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_path = ["lib"]
   s.required_ruby_version = ">= 1.9.3"
 
-  s.requirements << ["none"]
+  s.requirements << "none"
   s.rubygems_version = "2.0.3"
 
   s.summary = "Point of sale screen for Spree"
