@@ -19,7 +19,7 @@ describe Spree::Stock::PosAvailabilityValidator do
 
   describe 'ensures stock location' do
     it 'presence' do
-      @line_item.order.shipments.last.stock_location.should be_nil
+      @line_item.order.pos_shipment.stock_location.should be_nil
       @line_item.save
       @line_item.errors[:stock_location].should eq(['No Active Store Associated'])
     end

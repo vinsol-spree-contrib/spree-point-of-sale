@@ -172,4 +172,14 @@ describe Spree::Order do
       it { @order.associate_user_for_pos('new-user@pos.com').should eq(@new_user) }
     end
   end
+
+  describe '#pos_shipment' do
+    before { @shipments = [@shipment] }
+    
+    it 'should fetch all shipments' do
+      @order.should_receive(:shipments).and_return(@shipments)
+      @shipments.should_receive(:last).and_return(@shipment) 
+      @order.pos_shipment.should eq(@shipment)
+    end
+  end
 end

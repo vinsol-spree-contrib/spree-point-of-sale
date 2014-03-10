@@ -18,7 +18,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   def find
     init_search
     #TODO -> create one method for last_shipment in order_model as it is used in verious locations.
-    stock_location = @order.shipments.last.stock_location
+    stock_location = @order.pos_shipment.stock_location
     @search = Spree::Variant.includes([:product]).available_at_stock_location(stock_location.id).ransack(params[:q])
     @variants = @search.result(:distinct => true).page(params[:page]).per(PRODUCTS_PER_SEARCH_PAGE)
   end
@@ -31,8 +31,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def remove
-    line_item = @order.contents.remove(@variant, 1, @order.shipments.last)
-    @order.assign_shipment_for_pos if @order.reload.shipments.blank?
+    line_item = @order.contents.remove(@variant, 1, @order.pos_shipment)
+    @order.assign_shipment_for_pos if @order.reload.pos_shipment.blank?
     flash.notice = line_item.quantity.zero? ? Spree.t('product_removed') : 'Quantity Updated' 
     redirect_to admin_pos_show_order_path(:number => @order.number)
   end
@@ -82,7 +82,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def update_stock_location
-    @shipment = @order.shipments.last
+    @shipment = @order.pos_shipment
     @shipment.stock_location = user_stock_locations(spree_current_user).where(:id => params[:stock_location_id]).first
     if @shipment.save
       flash[:notice] = "Updated Successfully"
@@ -186,7 +186,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def add_variant var , quant = 1
-    line_item = @order.contents.add(var, quant, nil, @order.shipments.last)
+    line_item = @order.contents.add(var, quant, nil, @order.pos_shipment)
     var.product.save
     line_item
   end

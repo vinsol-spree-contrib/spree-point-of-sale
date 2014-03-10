@@ -7,7 +7,7 @@ Spree::Order.class_eval do
 
   def clean!
     payments.delete_all
-    line_items.each { |line_item| contents.remove(line_item.variant, line_item.quantity, shipments.last) }
+    line_items.each { |line_item| contents.remove(line_item.variant, line_item.quantity, pos_shipment) }
     #shipment is removed on removing all items, so initializing a new shipment
     assign_shipment_for_pos
   end
@@ -34,5 +34,9 @@ Spree::Order.class_eval do
     associate_with_user = Spree::User.where(:email => new_user_email).first || Spree::User.create_with_random_password(new_user_email)
     self.email = new_user_email if associate_with_user.valid?
     associate_with_user
+  end
+
+  def pos_shipment
+    shipments.last
   end
 end
