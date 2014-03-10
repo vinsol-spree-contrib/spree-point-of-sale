@@ -1,6 +1,7 @@
 Spree::Admin::StockLocationsController.class_eval do
   #TODO -> Is this method different from resource_controller update action ?
   #Yes, It is.
+  #Please check I think it is not required.
   def update
     if @stock_location.update_attributes(permitted_resource_params)
       flash[:success] = flash_message_for(@object, :successfully_updated)
