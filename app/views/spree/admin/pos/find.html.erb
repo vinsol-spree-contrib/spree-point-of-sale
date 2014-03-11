@@ -39,7 +39,7 @@ No Result Found
 <% end %>
 <% content_for :sidebar do %>
   <div>
-    <%= button_to "Back To Order", admin_pos_show_order_path(:number => @order.number) %>
+    <%= button_to "Back To Order", admin_pos_show_order_path(:number => @order.number), method: :get %>
   </div>
   <%= search_form_for   @search , :url => "/admin/pos/find/#{@order.number}/" do |f| %>
     <div class="box">
