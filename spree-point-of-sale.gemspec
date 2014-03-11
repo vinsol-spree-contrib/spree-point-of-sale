@@ -3,7 +3,7 @@
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.name = "spree-point-of-sale"
-  s.version = "1.1.0"
+  s.version = "1.1.1"
 
   s.author = ["Torsten R, Nishant Tuteja, Manish Kangia"]
 
@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.description = "Extend functionality for spree to give shop like ordering ability through admin end"
 
 
-  s.add_dependency('spree_core', '~> 2.1')
+  s.add_dependency('spree_core', '~> 2.1.0')
   s.add_dependency('barby', '>= 0')
   s.add_dependency('prawn', '>=0')
   s.add_dependency('chunky_png', '>=0')
