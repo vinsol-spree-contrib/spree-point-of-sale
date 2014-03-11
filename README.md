@@ -39,7 +39,7 @@ gem "spree-point-of-sale", '1.0.3', require: 'spree_pos'
 If you DONT change the :pos_printing config as described above, you must also add 
 
 ```ruby
-gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
+gem 'spree_html_invoice' , :git => 'git://github.com/vinsol/spree-html-invoice.git', tag: '1.2'
 ```
 
 ```ruby
