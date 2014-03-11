@@ -29,17 +29,22 @@ Add spree-point-of-sale to your Gemfile:
 gem "spree-point-of-sale", require: 'spree_pos'
 ```
 
-If you're still using Spree 2.0.x, you should do this instead:
+For specific spree versions:
 
 ```ruby
+#Spree 2.0.x
 gem "spree-point-of-sale", '1.0.3', require: 'spree_pos'
 ```
 
+```ruby
+#Spree 2.1.x
+gem "spree-point-of-sale", '1.1.1', require: 'spree_pos'
+```
 
 If you DONT change the :pos_printing config as described above, you must also add 
 
 ```ruby
-gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
+gem 'spree_html_invoice' , :git => 'git://github.com/vinsol/spree-html-invoice.git', tag: '1.2'
 ```
 
 ```ruby
