@@ -3,7 +3,7 @@
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.name = "spree-point-of-sale"
-  s.version = "1.2.0"
+  s.version = "1.2.1"
 
   s.author = ["Torsten R, Nishant Tuteja, Manish Kangia"]
 

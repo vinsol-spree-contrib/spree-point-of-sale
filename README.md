@@ -43,7 +43,7 @@ gem "spree-point-of-sale", '1.1.1', require: 'spree_pos'
 
 ```ruby
 #Spree 2.2.x
-gem "spree-point-of-sale", '1.2.0', require: 'spree_pos'
+gem "spree-point-of-sale", '1.2.1', require: 'spree_pos'
 ```
 
 If you DONT change the :pos_printing config as described above, you must also add 
