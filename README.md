@@ -26,7 +26,7 @@ To your Gemfile add:
 Add spree-point-of-sale to your Gemfile:
 
 ```ruby
-gem "spree-point-of-sale", require: 'spree_pos'
+gem "spree-point-of-sale", '1.0.3'
 ```
   
 If you DONT change the :pos_printing config as described above, you must also add 
