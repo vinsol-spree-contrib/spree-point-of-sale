@@ -29,7 +29,8 @@ describe Spree::Order do
 
   context 'scopes' do
     before :each do
-      @paid_order = Spree::Order.create!(:total => 100)
+      @paid_order = Spree::Order.create!
+      @paid_order.update_column(:total, 100)
       @paid_order.update_column(:payment_state,'paid')
       @unpaid_pos_order = Spree::Order.create!(:is_pos => true, :payment_state => 'checkout')
       @paid_pos_order = Spree::Order.create!(:is_pos => true, :payment_state => 'paid')
