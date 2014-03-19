@@ -8,7 +8,8 @@ describe Spree::StockLocation do
   let(:state) { country.states.create!(:name => 'mk_state') }
   let(:store) { Spree::StockLocation.create!(:name => 'store', :store => true, :address1 => "home", :address2 => "town", :city => "delhi", :zipcode => "110034", :country_id => country.id, :state_id => state.id, :phone => "07777676767") }
   let(:stock_location) { Spree::StockLocation.create!(:name => 'stock', :address1 => "home", :address2 => "town", :city => "delhi", :zipcode => "110034", :country_id => country.id, :state_id => state.id, :phone => "07777676767") }
-    
+  let(:shipping_category) { Spree::ShippingCategory.create!(:name => 'test-shipping') }
+
   context 'scopes' do
     it 'stores' do
       Spree::StockLocation.stores.should include(store)
@@ -43,7 +44,7 @@ describe Spree::StockLocation do
 
   describe '#can_supply?' do
     before do
-      @product = Spree::Product.create!(:name => 'test-product', :price => 10)
+      @product = Spree::Product.create!(:name => 'test-product', :price => 10, :shipping_category_id => shipping_category.id)
       @variant = @product.master
       @stock_item = store.stock_items.where(:variant_id => @variant.id).first
       @stock_item.update_column(:count_on_hand, 2)

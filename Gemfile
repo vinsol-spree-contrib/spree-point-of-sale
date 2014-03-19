@@ -1,9 +1,9 @@
 source "https://rubygems.org"
 gem 'rails', '3.2.16'
 gem 'mysql2'
+gem 'sqlite3'
 
-
-gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.3'
+gem 'spree', :git => 'git://github.com/spree/spree.git', :tag => 'v2.0.8'
 gem 'spree_html_invoice' , :git => 'git://github.com/dancinglightning/spree-html-invoice.git'
 
 # Provides basic authentication functionality for testing parts of your engine

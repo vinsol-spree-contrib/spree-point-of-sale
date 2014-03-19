@@ -4,10 +4,10 @@ describe Spree::Stock::PosAvailabilityValidator do
   let(:country) { Spree::Country.create!(:name => 'mk_country', :iso_name => "mk") }
   let(:state) { country.states.create!(:name => 'mk_state') }
   let(:store) { Spree::StockLocation.create!(:name => 'store', :store => true, :address1 => "home", :address2 => "town", :city => "delhi", :zipcode => "110034", :country_id => country.id, :state_id => state.id, :phone => "07777676767") }
-  
+  let(:shipping_category) { Spree::ShippingCategory.create!(:name => 'test-shipping') }
   before do
     @order = Spree::Order.create!(:is_pos => true)
-    @product = Spree::Product.create!(:name => 'test-product', :price => 10)
+    @product = Spree::Product.create!(:name => 'test-product', :price => 10, :shipping_category_id => shipping_category.id)
     @variant = @product.master
     @line_item = @order.line_items.build(:variant_id => @variant.id, :price => @product.price, :quantity => 3)
     @shipment = @order.shipments.create!
