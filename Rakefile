@@ -9,7 +9,7 @@ RSpec::Core::RakeTask.new
 
 task :default => [:spec, :cucumber ]
 
-spec = eval(File.read('spree_pos.gemspec'))
+spec = eval(File.read('spree-point-of-sale.gemspec'))
 
 Gem::PackageTask.new(spec) do |p|
   p.gem_spec = spec
