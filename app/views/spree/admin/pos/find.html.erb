@@ -2,7 +2,7 @@
 <table>
   <tr>
     <td>
-    <table class="index" id='listing_products'>
+    <table class="index table" id='listing_products'>
       <tr>
           <th>SKU</th>
           <th><%= Spree.t("image") %></th>
@@ -24,7 +24,9 @@
           <br> <%== variant.description[0 .. 200] if variant.description%></td>
           <td><%= variant.price %></td>
           <td class="actions">
-              <%= link_to( image_tag('admin/pos/select.jpg'), "/admin/pos/add/#{@order.number}/#{variant.id}") %>
+              <%= link_to add_admin_pos_path(number: @order.number, item: variant.id) do %>
+                <span class='glyphicon glyphicon-plus'></span>
+              <% end %>
           </td>
         </tr>
       <% end %>

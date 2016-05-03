@@ -23,3 +23,10 @@ table#pos-order-table { padding-top: 10px;}
 table#pos-order-table td.discount input.submit{ margin: 2px 0 0 10px;}
 fieldset.no-bottom-margin { margin-bottom: 0px;}
 a#create_pos_order { float:right; padding:4px 9px;}
+.mart-10 {
+  margin-top: 10px
+}
+.stock-location {
+  height: 55px;
+  border-top: 1px solid #cee1f4;
+}
