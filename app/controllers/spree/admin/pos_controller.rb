@@ -2,7 +2,8 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   before_action :load_order, :ensure_pos_order, :ensure_unpaid_order, except: :new
   helper_method :user_stock_locations
   before_action :load_variant, only: [:add, :remove]
-  before_action :ensure_active_store, :ensure_pos_shipping_method
+  before_action :ensure_active_store
+  before_action :ensure_pos_shipping_method
   before_action :ensure_payment_method, only: :update_payment
   before_action :ensure_existing_user, only: :associate_user
   before_action :check_unpaid_pos_order, only: :new
@@ -46,7 +47,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def apply_discount
-    @item.price = @item.variant.price * ( 1.0 - @discount/100.0 )
+    @item.price = @item.variant.price * (1.0 - @discount / 100.0)
     @item.save
     flash[:error] = @item.errors.full_messages.to_sentence if @item.errors.present?
     redirect_to admin_pos_show_order_path(number: @order.number)
@@ -135,16 +136,16 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def ensure_pos_shipping_method
-    redirect_to '/', flash: { error: Spree.t('pos_order.shipping_not_found')} and return unless Spree::ShippingMethod.find_by(name: SpreePos::Config[:pos_shipping])
+    redirect_to '/', flash: { error: Spree.t('pos_order.shipping_not_found')} unless Spree::ShippingMethod.find_by(name: SpreePos::Config[:pos_shipping])
   end
 
   def ensure_active_store
-    redirect_to '/', flash: { error: Spree.t('pos_order.active_store_not_found')} and return if Spree::StockLocation.stores.active.blank?
+    redirect_to '/', flash: { error: Spree.t('pos_order.active_store_not_found')} if Spree::StockLocation.stores.active.blank?
   end
 
   def load_order
     @order = Spree::Order.where(number: params[:number]).includes([{ line_items: [{ variant: [:default_price, { product: [:master] } ] }] } , { adjustments: :adjustable }] ).first
-    raise "No order found for -#{params[:number]}-" unless @order
+    redirect_to '/', flash: { error: "No order found for -#{params[:number]}-" } unless @order
   end
 
   def load_variant
