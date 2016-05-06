@@ -18,7 +18,7 @@ Spree::Order.class_eval do
     touch :completed_at
     create_tax_charge!
     save!
-    pending_payments.first.capture! if pending_payments.first.present?
+    find_uncaptured_pending_payments.capture!
     shipments.each { |shipment|  shipment.finalize_pos }
     deliver_order_confirmation_email
   end
@@ -41,4 +41,11 @@ Spree::Order.class_eval do
   def pos_shipment
     shipments.last
   end
+
+  private
+
+    def find_uncaptured_pending_payments
+      payments.find { |payment| payment.checkout? || payment.pending? }
+    end
+
 end

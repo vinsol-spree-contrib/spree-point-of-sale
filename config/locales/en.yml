@@ -22,8 +22,7 @@ en:
     remove_items: Removed all items
     add_user_failure: "Could not add the user: %{errors}"
     add_user_success: Successfully Associated User
-    shipment:
-      success_updated: Updated Successfully
+    shipment: Updated Successfully
     pos_order:
       invalid_discount: Please enter a valid discount
       not_pos: This is not a pos order

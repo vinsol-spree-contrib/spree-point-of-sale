@@ -1,6 +1,7 @@
 <ul data-hook="admin_pos_sidebar_menu" class="nav nav-sidebar" id="sidebar-pos">
   <li class="sidebar-menu-item">
-    <%= link_to admin_pos_path do %>
+    <% link_to_path = @order.present? ? admin_pos_path(number: @order.number) : new_admin_pos_path %>
+    <%= link_to link_to_path do %>
       <span class='icon icon-shopping-cart'></span>
       POS
     <% end %>
