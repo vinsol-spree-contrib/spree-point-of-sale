@@ -85,7 +85,7 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
     @shipment = @order.pos_shipment
     @shipment.stock_location = user_stock_locations(spree_current_user).find_by(id: params[:stock_location_id])
     if @shipment.save
-      flash[:notice] = Spree.t('shipment.success_updated')
+      flash[:notice] = Spree.t('shipment')
     else
       flash[:error] = @shipment.errors.full_messages.to_sentence
     end

@@ -27,7 +27,7 @@ class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   # moved to pdf as html has uncontrollable margins
   def print
     pdf = append_barcode_to_pdf_for_variant(@variant)
-    send_data pdf.render , type: 'application/pdf', filename: "#{@variant.name}.pdf"
+    send_data pdf.render, type: 'application/pdf', filename: "#{@variant.name}.pdf"
   end
 
   private
