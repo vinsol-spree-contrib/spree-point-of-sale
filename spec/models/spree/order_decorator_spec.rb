@@ -55,6 +55,7 @@ describe Spree::Order do
       allow(@order).to receive(:create_tax_charge!).and_return(true)
       allow(@order).to receive(:pending_payments).and_return(@payments)
       allow(@payment).to receive(:capture!).and_return(true)
+      allow(@payment).to receive(:checkout?).and_return(true)
       allow(@shipment).to receive(:finalize_pos).and_return(true)
       allow(@order).to receive(:deliver_order_confirmation_email).and_return(true)
       allow(@order).to receive(:save!).and_return(true)
@@ -62,7 +63,6 @@ describe Spree::Order do
 
     it { expect(@order).to receive(:touch).with(:completed_at) }
     it { expect(@order).to receive(:create_tax_charge!).and_return(true) }
-    it { expect(@order).to receive(:pending_payments).and_return(@payments) }
     it { expect(@payment).to receive(:capture!).and_return(true) }
     it { expect(@shipment).to receive(:finalize_pos).and_return(true) }
     it { expect(@order).to receive(:deliver_order_confirmation_email).and_return(true) }
