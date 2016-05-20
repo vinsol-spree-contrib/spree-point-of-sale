@@ -60,7 +60,6 @@ describe Spree::Admin::PosController do
         end
 
         describe 'loads and checks order' do
-          # it { Spree::Order.should_receive(:where).with(number: order.number).and_return([order]) }
           it { expect(order).to receive(:paid?).and_return(true) }
           it { expect(controller).not_to receive(:show) }
 
@@ -345,7 +344,6 @@ describe Spree::Admin::PosController do
       allow(controller).to receive(:ensure_active_store).and_return(true)
       allow(Spree::StockLocation).to receive_message_chain(:active,:stores,:first,:address).and_return(address)
       controller.instance_variable_set(:@order,order)
-      allow(controller).to receive(:check_valid_order).and_return(true)
     end
 
     describe 'new' do
@@ -372,7 +370,6 @@ describe Spree::Admin::PosController do
         it { expect(controller).to receive(:ensure_active_store).and_return(true) }
         it { expect(controller).to receive(:ensure_pos_shipping_method).and_return(true) }
         it { expect(controller).not_to receive(:ensure_payment_method) }
-        it { expect(controller).not_to receive(:check_valid_order) }
         after { send_request }
       end
 

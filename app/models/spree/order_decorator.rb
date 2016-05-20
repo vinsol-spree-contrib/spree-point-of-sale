@@ -9,7 +9,7 @@ Spree::Order.class_eval do
 
   def clean!
     payments.delete_all
-    line_items.each { |_li| contents.remove(_li.variant, _li.quantity, { shipment: pos_shipment }) }
+    line_items.each { |line_item| contents.remove(line_item.variant, line_item.quantity, { shipment: pos_shipment }) }
     #shipment is removed on removing all items, so initializing a new shipment
     assign_shipment_for_pos
   end

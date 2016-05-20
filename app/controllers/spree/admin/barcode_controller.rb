@@ -1,10 +1,3 @@
-require 'barby'
-require 'prawn'
-require 'prawn/measurement_extensions'
-require 'barby/barcode/code_128'
-require 'barby/barcode/ean_13'
-require 'barby/outputter/png_outputter'
-
 class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   include Admin::BarcodeHelper
 
@@ -15,8 +8,8 @@ class Spree::Admin::BarcodeController < Spree::Admin::BaseController
 
   def print_variants_barcodes
     if @variants.present?
-      pdf = @variants.inject(empty_pdf(height: 120)) { |pdf, variant| append_barcode_to_pdf_for_variant(variant, pdf) }
-      send_data pdf.render, type: 'application/pdf', filename: "#{@product.name}.pdf"
+      pdf = Spree::BarcodeGeneratorService.new.append_barcode_to_pdf_for_variants_of_product(@variants)
+      send_data pdf.render, type: 'application/pdf', filename: "#{ @product.name }.pdf"
     else
       #just to have @variant so that print can be called directly without a request skipping load method
       @variant = @product.master
@@ -26,8 +19,8 @@ class Spree::Admin::BarcodeController < Spree::Admin::BaseController
 
   # moved to pdf as html has uncontrollable margins
   def print
-    pdf = append_barcode_to_pdf_for_variant(@variant)
-    send_data pdf.render, type: 'application/pdf', filename: "#{@variant.name}.pdf"
+    pdf = Spree::BarcodeGeneratorService.new.append_barcode_to_pdf_for_variant(@variant)
+    send_data pdf.render, type: 'application/pdf', filename: "#{ @variant.name }.pdf"
   end
 
   private

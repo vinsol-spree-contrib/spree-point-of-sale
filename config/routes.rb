@@ -1,6 +1,7 @@
 Spree::Core::Engine.routes.draw do
   get "admin/barcode/print_variants_barcodes/:id", to: "admin/barcode#print_variants_barcodes", as: :admin_barcode_print_variants_barcodes
   get "admin/barcode/print/:id", to: "admin/barcode#print", as: :admin_barcode_print
+  get "admin/barcode/code/:id", to: "admin/barcode#code", as: :admin_barcode_code
 
   get "admin/pos/new" , to: "admin/pos#new", as: :new_admin_pos
   get "admin/pos/show/:number" , to: "admin/pos#show", as: :admin_pos_show_order

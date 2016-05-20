@@ -136,30 +136,22 @@ class Spree::Admin::PosController < Spree::Admin::BaseController
   end
 
   def ensure_pos_shipping_method
-    redirect_to '/', flash: { error: Spree.t('pos_order.shipping_not_found')} unless Spree::ShippingMethod.find_by(name: SpreePos::Config[:pos_shipping])
+    redirect_to root_path, flash: { error: Spree.t('pos_order.shipping_not_found')} unless Spree::ShippingMethod.find_by(name: SpreePos::Config[:pos_shipping])
   end
 
   def ensure_active_store
-    redirect_to '/', flash: { error: Spree.t('pos_order.active_store_not_found')} if Spree::StockLocation.stores.active.blank?
+    redirect_to root_path, flash: { error: Spree.t('pos_order.active_store_not_found')} if Spree::StockLocation.stores.active.blank?
   end
 
   def load_order
     @order = Spree::Order.where(number: params[:number]).includes([{ line_items: [{ variant: [:default_price, { product: [:master] } ] }] } , { adjustments: :adjustable }] ).first
-    redirect_to '/', flash: { error: "No order found for -#{params[:number]}-" } unless @order
+    redirect_to root_path, flash: { error: "No order found for -#{ params[:number] }-" } unless @order
   end
 
   def load_variant
     @variant = Spree::Variant.find_by(id: params[:item])
     unless @variant
       flash[:error] = Spree.t('pos_order.variant_not_found')
-      render :show
-    end
-  end
-
-  def check_valid_order
-    if @order.paid? || !@order.is_pos?
-      flash[:error] = Spree.t('pos_order.already_completed') if @order.paid?
-      flash[:error] = Spree.t('pos_order.not_pos') unless @order.is_pos?
       render :show
     end
   end

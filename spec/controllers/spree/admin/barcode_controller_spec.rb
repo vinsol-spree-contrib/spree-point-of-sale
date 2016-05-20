@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Spree::Admin::BarcodeController do
   let(:product) { mock_model(Spree::Product, name: 'test-product') }
-  let(:variant) { mock_model(Spree::Variant, name: 'test-variant') }
+  let(:variant) { mock_model(Spree::Variant, name: 'test-variant', price: '12') }
   let(:user) { mock_model(Spree::User) }
   let(:role) { mock_model(Spree::Role) }
   let(:roles) { [role] }
@@ -27,12 +27,14 @@ describe Spree::Admin::BarcodeController do
       allow(controller).to receive(:empty_pdf).and_return([])
       @pdf_object = Object.new
       allow(@pdf_object).to receive(:render).and_return('123')
+      allow(variant).to receive(:options_text).and_return('Size: XL, Color: Green')
     end
 
     context 'when variants present' do
       before do
         allow(product).to receive(:variants).and_return([variant])
-        allow(controller).to receive(:append_barcode_to_pdf_for_variant).with(variant, []).and_return(@pdf_object)
+        allow(Spree::BarcodeGeneratorService).to receive_message_chain(:new, :append_barcode_to_pdf_for_variant).and_return(@pdf_object)
+        allow(Spree::BarcodeGeneratorService).to receive_message_chain(:new, :append_barcode_to_pdf_for_variants_of_product).and_return(@pdf_object)
         allow(controller).to receive(:send_data).with('123' , type: "application/pdf" , filename: "#{product.name}.pdf"){controller.render nothing: true}
       end
 
@@ -40,7 +42,6 @@ describe Spree::Admin::BarcodeController do
       it { expect(product).not_to receive(:master) }
       it { expect(controller).not_to receive(:print) }
       it { expect(Spree::Product).to receive(:find).with(product.id.to_s).and_return(product) }
-      it { expect(controller).to receive(:append_barcode_to_pdf_for_variant).with(variant, []).and_return(@pdf_object) }
       it { expect(controller).to receive(:send_data).with('123' , type: "application/pdf" , filename: "#{product.name}.pdf"){controller.render nothing: true} }
 
       after { send_request({id: product.id}) }
@@ -50,14 +51,13 @@ describe Spree::Admin::BarcodeController do
       before do
         allow(product).to receive(:variants).and_return([])
         allow(product).to receive(:master).and_return(variant)
-        allow(controller).to receive(:append_barcode_to_pdf_for_variant).with(variant).and_return(@pdf_object)
-        allow(controller).to receive(:send_data).with('123' , type: "application/pdf" , filename: "#{variant.name}.pdf"){controller.render nothing: true}
+        allow(Spree::BarcodeGeneratorService).to receive_message_chain(:new, :append_barcode_to_pdf_for_variant).and_return(@pdf_object)
       end
 
       it { expect(product).to receive(:variants).and_return([]) }
       it { expect(product).to receive(:master).and_return(variant) }
       it { expect(Spree::Product).to receive(:find).with(product.id.to_s).and_return(product) }
-      it { expect(controller).to receive(:append_barcode_to_pdf_for_variant).with(variant).and_return(@pdf_object) }
+      it { expect(Spree::BarcodeGeneratorService).to receive_message_chain(:new, :append_barcode_to_pdf_for_variant).and_return(@pdf_object) }
       it { expect(controller).to receive(:send_data).with('123' , type: "application/pdf" , filename: "#{variant.name}.pdf"){controller.render nothing: true} }
 
       after { send_request({id: product.id}) }
@@ -73,12 +73,13 @@ describe Spree::Admin::BarcodeController do
       @pdf_object = Object.new
       allow(@pdf_object).to receive(:render).and_return('123')
       allow(Spree::Variant).to receive(:find).with(variant.id.to_s).and_return(variant)
-      allow(controller).to receive(:append_barcode_to_pdf_for_variant).with(variant).and_return(@pdf_object)
+      allow(Spree::BarcodeGeneratorService).to receive_message_chain(:new, :append_barcode_to_pdf_for_variant).and_return(@pdf_object)
       allow(controller).to receive(:send_data).with('123' , type: "application/pdf" , filename: "#{variant.name}.pdf"){controller.render nothing: true}
+      allow(variant).to receive(:options_text).and_return('Size: XL, Color: Green')
     end
 
     it { expect(Spree::Variant).to receive(:find).with(variant.id.to_s).and_return(variant) }
-    it { expect(controller).to receive(:append_barcode_to_pdf_for_variant).with(variant).and_return(@pdf_object) }
+    it { expect(Spree::BarcodeGeneratorService).to receive_message_chain(:new, :append_barcode_to_pdf_for_variant).and_return(@pdf_object) }
     it { expect(controller).to receive(:send_data).with('123' , type: "application/pdf" , filename: "#{variant.name}.pdf"){controller.render nothing: true} }
 
     after { send_request({id: variant.id}) }
