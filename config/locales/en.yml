@@ -14,3 +14,24 @@ en:
     item_description: 'Item Description'
     select: Select
     master_price: Master Price
+    no_active_store: No Active Store Associated
+    quantity_unavailable: Adding More Than Available
+    empty_inventory: Inventory Units assigned for the order. Please remove them to change stock location
+    no_card_name: No card name to be saved with this payment
+    quantity_updated: Quantity Updated
+    remove_items: Removed all items
+    add_user_failure: "Could not add the user: %{errors}"
+    add_user_success: Successfully Associated User
+    shipment: Updated Successfully
+    pos_order:
+      invalid_discount: Please enter a valid discount
+      not_pos: This is not a pos order
+      already_completed: This order is already completed. Please use a new one.
+      existing_order: You have an unpaid/empty order. Please either complete it or update items in the same order.
+      shipping_not_found: No shipping method available for POS orders. Please assign one.
+      active_store_not_found: No active store present. Please assign one.
+      variant_not_found: No variant
+      payment_not_found: Please select a payment method
+    user:
+      not_found_email: 'No user with email %{email}'
+      existing_user: 'User Already exists for the email %{email}'

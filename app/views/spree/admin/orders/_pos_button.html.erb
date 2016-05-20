@@ -1,1 +1,1 @@
-<%= button_link_to("Pos", "/admin/pos/show/#{@order.number}" )%>
+<%= button_link_to("Pos", admin_pos_show_order_path(number: @order.number))%>

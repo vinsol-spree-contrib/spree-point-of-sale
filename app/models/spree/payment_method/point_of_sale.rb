@@ -1,6 +1,6 @@
 module Spree
   class PaymentMethod::PointOfSale < PaymentMethod
-    
+
     def actions
       %w{capture void}
     end
@@ -16,15 +16,28 @@ module Spree
     end
 
     def capture(*args)
-      ActiveMerchant::Billing::Response.new(true, "", {}, {})
+      simulated_successful_billing_response
     end
 
     def void(*args)
-      ActiveMerchant::Billing::Response.new(true, "", {}, {})
+      simulated_successful_billing_response
+    end
+
+    def cancel(*args)
+      simulated_successful_billing_response
+    end
+
+    def credit(*args)
+      simulated_successful_billing_response
     end
 
     def source_required?
       false
     end
+
+    private
+      def simulated_successful_billing_response
+        ActiveMerchant::Billing::Response.new(true, "", {}, {})
+      end
   end
 end
