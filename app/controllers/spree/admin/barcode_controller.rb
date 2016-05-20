@@ -1,7 +1,7 @@
 class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   include Admin::BarcodeHelper
 
-  before_action :load, only: :print
+  before_action :load_variant, only: :print
   before_action :load_product_and_variants, only: :print_variants_barcodes
   layout :false
   rescue_from ActiveRecord::RecordNotFound, with: :resource_not_found
@@ -32,7 +32,7 @@ class Spree::Admin::BarcodeController < Spree::Admin::BaseController
   #   send_data barcode.to_png(:xdim => 5) , :type => 'image/png', :disposition => 'inline'
   # end
 
-  def load
+  def load_variant
     @variant = Spree::Variant.find(params[:id])
   end
 
