@@ -29,10 +29,10 @@ describe Spree::Order do
       @paid_order = Spree::Order.create!
       @paid_order.update_column(:total,100)
       @paid_order.update_column(:payment_state,'paid')
-      @unpaid_pos_order = Spree::Order.create!(is_pos: true, payment_state: 'checkout')
+      @unpaid_pos_order = Spree::Order.create!(is_pos: true, payment_state: 'balance_due')
       @paid_pos_order = Spree::Order.create!(is_pos: true, payment_state: 'paid')
       @paid_pos_order.update_column(:payment_state,'paid')
-      @unpaid_order = Spree::Order.create!(payment_state: 'checkout')
+      @unpaid_order = Spree::Order.create!(payment_state: 'balance_due')
     end
 
     it { expect(Spree::Order.pos).to match_array([@order, @unpaid_pos_order, @paid_pos_order]) }

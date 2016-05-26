@@ -19,7 +19,7 @@ describe Spree::Admin::BarcodeController do
 
   describe 'print_variants_barcodes' do
     def send_request(params = {})
-      get :print_variants_barcodes, params.merge!({use_route: 'spree'})
+      spree_get :print_variants_barcodes, params
     end
 
     before do
@@ -66,7 +66,7 @@ describe Spree::Admin::BarcodeController do
 
   describe 'print' do
     def send_request(params = {})
-      get :print, params.merge!({use_route: 'spree'})
+      spree_get :print, params
     end
 
     before do

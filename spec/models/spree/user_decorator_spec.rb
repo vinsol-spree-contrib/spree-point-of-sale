@@ -7,10 +7,10 @@ describe Spree::User do
       @paid_order = user.orders.create!
       @paid_order.update_column(:total,100)
       @paid_order.update_column(:payment_state,'paid')
-      @unpaid_pos_order = user.orders.create!(is_pos: true, payment_state: 'checkout')
+      @unpaid_pos_order = user.orders.create!(is_pos: true, payment_state: 'balance_due')
       @paid_pos_order = user.orders.create!(is_pos: true, payment_state: 'paid')
       @paid_pos_order.update_column(:payment_state,'paid')
-      @unpaid_order = user.orders.create!(payment_state: 'checkout')
+      @unpaid_order = user.orders.create!(payment_state: 'balance_due')
     end
 
     it { expect(user.unpaid_pos_orders).to eq([@unpaid_pos_order]) }

@@ -3,12 +3,18 @@ require 'spec_helper'
 describe Spree::Variant do
   let(:shipping_category) { Spree::ShippingCategory.create!(name: 'test-shipping') }
   let(:product) { Spree::Product.create!( name: 'new_product', price: 10, available_on: 'Fri, 19 Jul 2013 08:11:06 UTC +00:00', shipping_category_id: shipping_category.id ) }
+  let(:option_type) { FactoryGirl.create(:product_option_type, product: product).option_type }
 
   describe 'scopes' do
     describe 'available_at_stock_location' do
       before do
-        @variant = product.variants.create!(sku: "M12343")
-        @unavailable_variant = product.variants.create!(sku: "M12344")
+        @variant, @unavailable_variant = FactoryGirl.create_list(:variant, 2, product: product)
+        option_value1, option_value2 = FactoryGirl.create_list(:option_value, 2, option_type: option_type)
+        @variant.option_values = [option_value1]
+        @unavailable_variant.option_values = [option_value2]
+
+        # @variant = product.variants.create!(sku: "M12343")
+        # @unavailable_variant = product.variants.create!(sku: "M12344")
   
         @stock_location1 = Spree::StockLocation.create!(name: 'test_location')
         @stock_location2 = Spree::StockLocation.create!(name: 'test_location')
