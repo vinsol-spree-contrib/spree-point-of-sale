@@ -11,8 +11,8 @@ describe Spree::Stock::Coordinator do
       @active_store = Spree::StockLocation.create!(name: 'store', store: true, active: true, address1: "home", address2: "town", city: "delhi", zipcode: "110034", country_id: country.id, state_id: state.id, phone: "07777676767")
       @inactive_store = Spree::StockLocation.create!(name: 'inactive-store', store: true, active: false, address1: "home", address2: "town", city: "delhi", zipcode: "110034", country_id: country.id, state_id: state.id, phone: "07777676767")
       @coordinator = Spree::Stock::Coordinator.new(order)
-      @packer = Spree::Stock::Packer.new(@stock_location, order)
-      @package = Spree::Stock::Package.new(@stock_location, order)
+      @packer = Spree::Stock::Packer.new(@stock_location, order.inventory_units)
+      @package = Spree::Stock::Package.new(@stock_location)
       allow(@packer).to receive(:packages).and_return([@package])
       allow(@coordinator).to receive(:build_packer).with(@stock_location, order.inventory_units).and_return(@packer)
     end

@@ -40,7 +40,7 @@ describe Spree::Admin::PosController do
 
     describe 'ensure order is pos and unpaid' do
       def send_request(params = {})
-        get :show, params.merge({use_route: 'spree'})
+        spree_get :show, params
       end
 
       context 'order does not exist' do
@@ -113,7 +113,7 @@ describe Spree::Admin::PosController do
     describe 'ensure_active_store' do
       before { allow(controller).to receive(:ensure_active_store).and_call_original }
       def send_request(params = {})
-        get :new, params.merge!(use_route: 'spree')
+        spree_get :new, params
       end
 
       context 'store does not exist' do
@@ -170,7 +170,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        get :new, params.merge!(use_route: 'spree')
+        spree_get :new, params
       end
 
       context 'pos_shipping_method exists' do
@@ -216,7 +216,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        post :add, params.merge!(use_route: 'spree')
+        spree_post :add, params
       end
 
       context 'variant present' do
@@ -267,7 +267,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        post :update_payment, params.merge!({ use_route: 'spree'})
+        spree_post :update_payment, params
       end
 
       context 'payment method exists' do
@@ -314,7 +314,7 @@ describe Spree::Admin::PosController do
 
     describe 'ensure existing user' do
       def send_request(params = {})
-        post :associate_user, params.merge!({use_route: 'spree'})
+        spree_post :associate_user, params
       end
 
       context 'to be associated old user does not exist' do
@@ -363,7 +363,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        get :new, params.merge!(use_route: 'spree')
+        spree_get :new, params
       end
 
       context 'before filters' do
@@ -427,7 +427,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        post :update_line_item_quantity, params.merge!({use_route: 'spree'})
+        spree_post :update_line_item_quantity, params
       end
 
       context 'update_line_item_quantity' do
@@ -464,7 +464,7 @@ describe Spree::Admin::PosController do
 
     describe 'apply discount' do
       def send_request(params = {})
-        post :apply_discount, params.merge!({use_route: 'spree'})
+        spree_post :apply_discount, params
       end
 
       before do
@@ -494,7 +494,7 @@ describe Spree::Admin::PosController do
 
     describe 'find' do
       def send_request(params = {})
-        get :find, params.merge!(use_route: 'spree')
+        spree_get :find, params
       end
 
       before do
@@ -531,7 +531,7 @@ describe Spree::Admin::PosController do
 
     describe 'print' do
       def send_request(params = {})
-        post :update_payment, params.merge!({ use_route: 'spree'})
+        spree_post :update_payment, params
       end
 
       before do
@@ -569,7 +569,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        post :add, params.merge!(use_route: 'spree')
+        spree_post :add, params
       end
 
       describe 'adds to order' do
@@ -637,7 +637,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        post :remove, params.merge!(use_route: 'spree')
+        spree_post :remove, params
       end
 
       describe 'removes from order' do
@@ -699,7 +699,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        put :clean_order, params.merge!({use_route: 'spree'})
+        spree_put :clean_order, params
       end
 
       context 'before filters' do
@@ -737,7 +737,7 @@ describe Spree::Admin::PosController do
       end
 
       def send_request(params = {})
-        post :associate_user, params.merge!({use_route: 'spree'})
+        spree_post :associate_user, params
       end
 
       context 'before filters' do
@@ -792,7 +792,7 @@ describe Spree::Admin::PosController do
 
     describe 'update_payment' do
       def send_request(params = {})
-        post :update_payment, params.merge!({ use_route: 'spree'})
+        spree_post :update_payment, params
       end
 
       before do
@@ -853,7 +853,7 @@ describe Spree::Admin::PosController do
 
     describe 'update_stock_location' do
       def send_request(params = {})
-        put :update_stock_location, params.merge!(use_route: 'spree')
+        spree_put :update_stock_location, params
       end
 
       before do
