@@ -3,7 +3,7 @@
 Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.name = "spree-point-of-sale"
-  s.version = "3.1.0"
+  s.version = "3.2.0.alpha"
   s.email     = 'info@vinsol.com'
   s.homepage  = 'http://vinsol.com'
   s.author = ["Torsten R, Nishant Tuteja, Manish Kangia"]
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.require_path = ["lib"]
   s.requirements << "none"
 
-  s.add_dependency('spree_core', '~> 3.1.0.beta')
+  s.add_dependency('spree_core', '~> 3.2.0.alpha')
   s.add_dependency('barby', '>= 0')
   s.add_dependency('prawn', '>=0')
   s.add_dependency('chunky_png', '>=0')
