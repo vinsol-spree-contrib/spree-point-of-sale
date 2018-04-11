@@ -16,7 +16,7 @@ Deface::Override.new(
   insert_bottom: "[data-hook='variants_row'] .actions",
   original: 'b918c38c9d3d9213d08b992cfc2c52dd0952ccf7',
   text: %q{
-    <%= link_to admin_barcode_print_path(product.id), class: 'btn btn-primary btn-sm' do %>
+    <%= link_to admin_barcode_print_path(variant.product.id), class: 'btn btn-primary btn-sm' do %>
       <span class='glyphicon glyphicon-barcode'></span>
     <% end %>
   }
